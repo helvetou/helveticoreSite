@@ -1,9 +1,9 @@
-/* Helveticore — JavaScript léger (progressive enhancement).
-   Rien de bloquant : le site reste entièrement utilisable sans JS. */
+/* Helveticore — lightweight JavaScript (progressive enhancement).
+   Nothing is blocking: the site remains fully usable without JS. */
 (function () {
   "use strict";
 
-  /* 1. Navigation mobile (toggle + fermeture sur clic de lien) */
+  /* 1. Mobile navigation (toggle + close on link click) */
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.getElementById("site-nav");
 
@@ -21,7 +21,7 @@
     });
   }
 
-  /* 2. Thème clair / sombre — suit le système par défaut, persiste le choix */
+  /* 2. Light / dark theme — follows the system by default, persists the choice */
   var themeToggle = document.querySelector(".theme-toggle");
   var STORAGE_KEY = "helveticore-theme";
 
@@ -41,7 +41,7 @@
         applyTheme(saved);
       }
     } catch (err) {
-      /* stockage indisponible : on conserve le thème système */
+      /* storage unavailable: keep the system theme */
     }
 
     themeToggle.addEventListener("click", function () {
@@ -56,7 +56,7 @@
     });
   }
 
-  /* 3. Année du pied de page */
+  /* 3. Footer year */
   var year = document.getElementById("year");
   if (year) {
     year.textContent = String(new Date().getFullYear());

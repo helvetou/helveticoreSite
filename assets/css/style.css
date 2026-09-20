@@ -1,7 +1,7 @@
 /* ============================================================
-   Helveticore — feuille de style
-   Site statique léger, sans framework. Design « Swiss minimal » :
-   typographie système, grille stricte, accent rouge, mode sombre.
+   Helveticore — stylesheet
+   Lightweight static site, no framework. "Swiss minimal" design:
+   system typography, strict grid, red accent, dark mode.
    ============================================================ */
 
 :root {
@@ -298,7 +298,7 @@ a:hover {
   }
 }
 
-/* ---------- Typographie ---------- */
+/* ---------- Typography ---------- */
 h1, h2, h3, h4 {
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -440,7 +440,7 @@ h3 {
   border-color: var(--ink-faint);
 }
 
-/* ---------- Grille de cartes ---------- */
+/* ---------- Card grid ---------- */
 .grid {
   display: grid;
   gap: 20px;
@@ -555,7 +555,7 @@ h3 {
   border: 1px solid var(--line-strong);
 }
 
-/* ---------- KPI blocs ---------- */
+/* ---------- KPI blocks ---------- */
 .kpi-banner {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -588,7 +588,7 @@ h3 {
   font-size: 0.95rem;
 }
 
-/* ---------- Listes ---------- */
+/* ---------- Lists ---------- */
 .clean-list {
   list-style: none;
   margin: 0;
@@ -608,7 +608,7 @@ h3 {
   color: var(--ink);
 }
 
-/* ---------- Flux (pipeline) ---------- */
+/* ---------- Flow (pipeline) ---------- */
 .flow {
   display: flex;
   flex-wrap: wrap;
@@ -644,7 +644,7 @@ h3 {
   font-weight: 700;
 }
 
-/* ---------- Tableaux ---------- */
+/* ---------- Tables ---------- */
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -713,7 +713,7 @@ pre .hl {
   color: var(--code-accent);
 }
 
-/* ---------- Définition / décisions ---------- */
+/* ---------- Definition / decisions ---------- */
 .decision {
   border-left: 3px solid var(--accent);
   padding: 4px 0 4px 20px;
@@ -758,7 +758,7 @@ pre .hl {
   color: var(--teal);
 }
 
-/* ---------- Appel à l'action / note ---------- */
+/* ---------- Call-to-action / note ---------- */
 .note {
   background: var(--amber-soft);
   border: 1px solid color-mix(in srgb, var(--amber) 35%, var(--line));
@@ -899,7 +899,7 @@ pre .hl {
   }
 }
 
-/* ---------- Accessibilité : réduction des animations ---------- */
+/* ---------- Accessibility: reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

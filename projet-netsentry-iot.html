@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NetSentry-IoT — Sonde de cybersécurité réseau · Helveticore</title>
-  <meta name="description" content="NetSentry-IoT : sonde logicielle autonome de détection d'anomalies et d'audit des protocoles IoT. Conformité NIS2 / RGPD, détection et isolation < 5 ms sans signature Cloud.">
+  <title>NetSentry-IoT — Network cybersecurity probe · Helveticore</title>
+  <meta name="description" content="NetSentry-IoT: an autonomous software probe for anomaly detection and IoT protocol auditing. NIS2 / GDPR compliance, < 5 ms detection and isolation with no Cloud signature dependency.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="index.html" aria-label="Helveticore — accueil">
+    <a class="brand" href="index.html" aria-label="Helveticore — home">
       <span class="brand-mark" aria-hidden="true">◈</span>
       <span class="brand-name">Helveticore</span>
       <span class="brand-sub">IoT · Edge · GreenTech</span>
@@ -20,16 +20,16 @@
       <span class="nav-toggle-label">Menu</span>
       <span class="nav-toggle-icon" aria-hidden="true"></span>
     </button>
-    <nav class="site-nav" id="site-nav" aria-label="Navigation principale">
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
       <ul>
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="methode.html">Méthode</a></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="methode.html">Method</a></li>
         <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
         <li><a href="projet-fog-crypto-core.html">Fog-Crypto</a></li>
         <li><a href="projet-netsentry-iot.html" aria-current="page">NetSentry</a></li>
       </ul>
     </nav>
-    <button class="theme-toggle" type="button" aria-label="Changer de thème (clair / sombre)">
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     </button>
@@ -40,74 +40,74 @@
   <section class="section">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Projet 3 du triptyque</span>
+        <span class="eyebrow">Project 3 of the triptych</span>
         <h1>NetSentry-IoT</h1>
-        <p class="lede">Sonde logicielle autonome de <strong>détection d'anomalies</strong> et
-          d'<strong>audit des protocoles IoT</strong>. Positionnement : conformité réglementaire
-          (<strong>NIS2 / RGPD</strong>) et durcissement cyber des parcs de capteurs industriels
-          distribués.</p>
+        <p class="lede">An autonomous software probe for <strong>anomaly detection</strong> and
+          <strong>IoT protocol auditing</strong>. Positioning: regulatory compliance
+          (<strong>NIS2 / GDPR</strong>) and cyber hardening of distributed industrial sensor
+          fleets.</p>
         <div style="margin-top:16px">
-          <span class="status status-init"><span class="status-dot" aria-hidden="true"></span>Phase : cadrage — structure initialisée</span>
+          <span class="status status-init"><span class="status-dot" aria-hidden="true"></span>Phase: framing — structure initialized</span>
         </div>
       </div>
 
       <div class="kpi-banner" style="margin-bottom:40px">
         <div class="kpi">
           <div class="kpi-value"><em>&lt;&nbsp;5&nbsp;ms</em></div>
-          <div class="kpi-label">détection et isolation des paquets malveillants à la périphérie</div>
+          <div class="kpi-label">malicious packet detection and isolation at the edge</div>
         </div>
         <div class="kpi">
-          <div class="kpi-value"><em>Sans Cloud</em></div>
-          <div class="kpi-label">détection locale, sans dépendance à une base de signatures hébergée</div>
+          <div class="kpi-value"><em>No Cloud</em></div>
+          <div class="kpi-label">local detection, no dependency on a hosted signature database</div>
         </div>
       </div>
 
       <div class="grid grid-2" style="margin-bottom:40px">
         <div class="card">
-          <h3>Fiche projet</h3>
+          <h3>Project card</h3>
           <ul class="clean-list">
-            <li><strong>Développé par</strong> — Helveticore OÜ (Estonie)</li>
-            <li><strong>Maturité</strong> — CMMI Level 3 « Defined »</li>
-            <li><strong>Conformité</strong> — NIS2 / RGPD</li>
-            <li><strong>Moteur d'analyse</strong> — Scapy (inspection profonde)</li>
+            <li><strong>Developed by</strong> — Helveticore OÜ (Estonia)</li>
+            <li><strong>Maturity</strong> — CMMI Level 3 “Defined”</li>
+            <li><strong>Compliance</strong> — NIS2 / GDPR</li>
+            <li><strong>Analysis engine</strong> — Scapy (deep inspection)</li>
           </ul>
         </div>
         <div class="card">
-          <h3>Sous-projets (src/)</h3>
+          <h3>Sub-projects (src/)</h3>
           <ul class="clean-list">
-            <li><code>packet-engine/</code> — analyse de paquets basée sur Scapy.</li>
-            <li><code>protocol-inspection/</code> — inspection profonde MQTT, HTTP, Zigbee.</li>
-            <li><code>attack-simulator/</code> — générateur de trafic et simulateur de sources d'attaques.</li>
-            <li><code>anomaly-detection/</code> — analyse comportementale locale : spoofing et DoS.</li>
+            <li><code>packet-engine/</code> — packet analysis based on Scapy.</li>
+            <li><code>protocol-inspection/</code> — deep inspection of MQTT, HTTP, Zigbee.</li>
+            <li><code>attack-simulator/</code> — traffic generator and attack-source simulator.</li>
+            <li><code>anomaly-detection/</code> — local behavioral analysis: spoofing and DoS.</li>
           </ul>
         </div>
       </div>
 
-      <h2>Jalons &amp; risques</h2>
+      <h2>Milestones &amp; risks</h2>
       <div class="grid grid-2" style="margin-top:16px">
         <div class="card">
-          <h3>Jalons</h3>
+          <h3>Milestones</h3>
           <ul class="clean-list">
-            <li>1 · Banc d'essai virtualisé : trafic IoT simulé + scénarios d'attaque rejouables.</li>
-            <li>2 · Inspection protocolaire MQTT/HTTP/Zigbee sur captures rejouées.</li>
-            <li>3 · Détection comportementale spoofing/DoS avec mesure de latence.</li>
-            <li>4 · Isolation &lt; 5 ms et rapports de conformité NIS2 / RGPD.</li>
+            <li>1 · Virtual test bench: simulated IoT traffic + replayable attack scenarios.</li>
+            <li>2 · MQTT/HTTP/Zigbee protocol inspection on replayed captures.</li>
+            <li>3 · Spoofing/DoS behavioral detection with latency measurement.</li>
+            <li>4 · &lt; 5 ms isolation and NIS2 / GDPR compliance reports.</li>
           </ul>
         </div>
         <div class="card">
-          <h3>Risques principaux (RSK)</h3>
+          <h3>Key risks (RSK)</h3>
           <ul class="clean-list">
-            <li><strong>Faux positifs</strong> — mitigés par un apprentissage/étalonnage local et des seuils traçables.</li>
-            <li><strong>Évasion de détection sur protocoles chiffrés</strong> — à documenter comme limite.</li>
-            <li><strong>Empreinte réseau/CPU de la sonde</strong> — la détection &lt; 5 ms impose un chemin rapide.</li>
+            <li><strong>False positives</strong> — mitigated by local learning/calibration and traceable thresholds.</li>
+            <li><strong>Detection evasion on encrypted protocols</strong> — to be documented as a limitation.</li>
+            <li><strong>Probe network/CPU footprint</strong> — &lt; 5 ms detection requires a fast path.</li>
           </ul>
         </div>
       </div>
 
       <div class="note" style="margin-top:32px">
-        <strong>État courant :</strong> la structure CMMI du projet est initialisée (exigences,
-        conception, banc d'essai, performance) et les sous-projets sont définis. Les artefacts
-        détaillés restent à rédiger.
+        <strong>Current state:</strong> the project's CMMI structure is initialized (requirements,
+        design, test bench, performance) and the sub-projects are defined. Detailed artifacts remain
+        to be written.
       </div>
     </div>
   </section>
@@ -118,14 +118,14 @@
     <div class="footer-grid">
       <div class="footer-col">
         <h3>Helveticore OÜ</h3>
-        <p class="muted">Société d'ingénierie IoT &amp; Edge Computing, enregistrée à Tallinn
-          (Estonie).</p>
-        <p class="faint">Registre : 17526982 · Fondée en 2026</p>
+        <p class="muted">IoT &amp; Edge Computing engineering company, registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
       </div>
       <div class="footer-col">
-        <h3>Coordonnées</h3>
+        <h3>Contact</h3>
         <ul>
-          <li>Harju maakond, Tallinn,<br>Kesklinna linnaosa,<br>Tartu mnt 67/1-13b, 10115</li>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
           <li><a href="mailto:haroudm@gmail.com">haroudm@gmail.com</a></li>
           <li><a href="tel:+41766631857">+41 76 663 18 57</a></li>
         </ul>
@@ -133,8 +133,8 @@
       <div class="footer-col">
         <h3>Navigation</h3>
         <ul>
-          <li><a href="index.html">Accueil</a></li>
-          <li><a href="methode.html">Méthode</a></li>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="methode.html">Method</a></li>
           <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
           <li><a href="projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
           <li><a href="projet-netsentry-iot.html">NetSentry-IoT</a></li>
@@ -142,8 +142,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© <span id="year">2026</span> Helveticore OÜ — Tallinn, Estonie.</span>
-      <span>Site statique HTML/CSS/JS · Cloudflare Pages</span>
+      <span>© <span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
     </div>
   </div>
 </footer>

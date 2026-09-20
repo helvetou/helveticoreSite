@@ -1,78 +1,77 @@
-# Helveticore — Site statique
+# Helveticore — Static site
 
-Site web de **Helveticore OÜ** (Tallinn, Estonie). Statique, sans framework ni étape de
-build : HTML + CSS + JavaScript uniquement, prêt à être publié tel quel sur
-**Cloudflare Pages**.
+Website for **Helveticore OÜ** (Tallinn, Estonia). Static, framework-free, no build step:
+plain HTML + CSS + JavaScript only, ready to be published as-is on **Cloudflare Pages**.
 
-Le contenu reflète l'état courant du référentiel [`../EdgeStream-GW`](../EdgeStream-GW)
-à la date de génération. Aucune donnée n'est inventée : les fiches projet, KPIs, exigences,
-décisions et jalons sont extraits de ce dépôt.
+The content reflects the current state of the [`../EdgeStream-GW`](../EdgeStream-GW)
+repository as of the generation date. Nothing is invented: the project cards, KPIs,
+requirements, decisions and milestones are extracted from that repository.
 
 ## Structure
 
 ```text
 .
-├── index.html                     Accueil (entreprise, triptyque, état courant, contact)
-├── methode.html                   Méthodologie CMMI Level 3
-├── projet-edgestream-gw.html      EdgeStream-GW — état courant détaillé
+├── index.html                     Home (company, triptych, current state, contact)
+├── methode.html                   CMMI Level 3 methodology
+├── projet-edgestream-gw.html      EdgeStream-GW — detailed current state
 ├── projet-fog-crypto-core.html    Fog-Crypto Core
 ├── projet-netsentry-iot.html      NetSentry-IoT
 ├── assets/
-│   ├── css/style.css              Feuille de style unique (design « Swiss minimal », sombre auto)
-│   └── js/main.js                 JS léger : nav mobile, thème, année (progressive enhancement)
+│   ├── css/style.css              Single stylesheet ("Swiss minimal" design, auto dark mode)
+│   └── js/main.js                 Lightweight JS: mobile nav, theme, year (progressive enhancement)
 ├── favicon.svg                    Favicon
-├── robots.txt                     Robots + pointeur de sitemap
-├── sitemap.xml                    Sitemap (domaine helveticore.ee)
-└── _headers                       En-têtes de sécurité / cache (Cloudflare Pages)
+├── robots.txt                     Robots + sitemap pointer
+├── sitemap.xml                    Sitemap (helveticore.ee domain)
+└── _headers                       Security / cache headers (Cloudflare Pages)
 ```
 
-## Aperçu local
+## Local preview
 
-Aucun build requis. Servir le dossier avec un simple serveur statique :
+No build required. Serve the folder with a simple static server:
 
 ```bash
 cd helveticoreSite
 python3 -m http.server 8000
-# puis ouvrir http://localhost:8000
+# then open http://localhost:8000
 ```
 
-Le JavaScript est entièrement optionnel : le site reste navigable sans JS
-(navigation, contenu et liens fonctionnent). Le mode sombre suit `prefers-color-scheme`
-et propose un basculement manuel persistant.
+JavaScript is entirely optional: the site remains navigable without JS (navigation, content
+and links work). Dark mode follows `prefers-color-scheme` and offers a persistent manual
+toggle.
 
-## Déploiement sur Cloudflare Pages
+## Deploying to Cloudflare Pages
 
-Deux options, toutes deux sans configuration serveur :
+Two options, both without server configuration:
 
-### Option A — Connexion Git (recommandée)
+### Option A — Git connection (recommended)
 
-1. Pousser ce dossier dans un dépôt Git (GitHub / GitLab).
-2. Dans le tableau de bord Cloudflare : **Workers & Pages → Create → Pages → Connect to Git**.
-3. Sélectionner le dépôt, la branche de production, puis :
-   - **Build command** : *(laisser vide)*
-   - **Build output directory** : `/` (racine du dépôt)
-4. Déployer. Le fichier `_headers` est appliqué automatiquement.
+1. Push this folder to a Git repository (GitHub / GitLab).
+2. In the Cloudflare dashboard: **Workers & Pages → Create → Pages → Connect to Git**.
+3. Select the repository and the production branch, then:
+   - **Build command**: *(leave empty)*
+   - **Build output directory**: `/` (repository root)
+4. Deploy. The `_headers` file is applied automatically.
 
-### Option B — Téléversement direct
+### Option B — Direct upload
 
 ```bash
 npm install -g wrangler
 wrangler pages deploy . --project-name=helveticore
 ```
 
-### Domaine
+### Domain
 
-Ajouter le domaine `helveticore.ee` (ou un sous-domaine `*.pages.dev`) dans
-**Pages → Custom domains**, puis suivre les instructions DNS.
+Add the `helveticore.ee` domain (or a `*.pages.dev` subdomain) in
+**Pages → Custom domains**, then follow the DNS instructions.
 
-## Maintenir le site à jour
+## Keeping the site up to date
 
-Le site décrit l'état du portfolio. Quand le référentiel `EdgeStream-GW` évolue,
-mettre à jour en priorité :
+The site describes the state of the portfolio. When the `EdgeStream-GW` repository evolves,
+update in priority:
 
-- les badges de statut (`Phase : …`) sur chaque page projet ;
-- la section « État actuel du référentiel » de `index.html` ;
-- les KPIs, jalons et décisions si de nouveaux artefacts CMMI sont rédigés.
+- the status badges (`Phase: …`) on each project page;
+- the "Current repository state" section of `index.html`;
+- the KPIs, milestones and decisions when new CMMI artifacts are written.
 
-Toute modification de contenu doit rester fidèle au dépôt source — c'est la règle de
-transparence du site.
+Any content change must stay faithful to the source repository — that is the site's
+transparency rule.
