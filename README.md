@@ -21,7 +21,7 @@ requirements, decisions and milestones are extracted from that repository.
 │   └── js/main.js                 Lightweight JS: mobile nav, theme, year (progressive enhancement)
 ├── favicon.svg                    Favicon
 ├── robots.txt                     Robots + sitemap pointer
-├── sitemap.xml                    Sitemap (helveticore.ee domain)
+├── sitemap.xml                    Sitemap (helveticore.com domain)
 └── _headers                       Security / cache headers (Cloudflare Pages)
 ```
 
@@ -61,7 +61,7 @@ wrangler pages deploy . --project-name=helveticore
 
 ### Domain
 
-Add the `helveticore.ee` domain (or a `*.pages.dev` subdomain) in
+Add the `helveticore.com` domain (or a `*.pages.dev` subdomain) in
 **Pages → Custom domains**, then follow the DNS instructions.
 
 ## Keeping the site up to date
