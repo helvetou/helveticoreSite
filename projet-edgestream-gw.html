@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EdgeStream-GW — Passerelle IoT &amp; Edge Analytics · Helveticore</title>
+  <meta name="description" content="EdgeStream-GW : passerelle logicielle industrielle ultra-légère pour Smart Grid. KPI −75 % de volume Cloud, actuation locale < 50 ms. Exigences, décisions d'architecture, traçabilité et jalons.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html" aria-label="Helveticore — accueil">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">IoT · Edge · GreenTech</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Navigation principale">
+      <ul>
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="methode.html">Méthode</a></li>
+        <li><a href="projet-edgestream-gw.html" aria-current="page">EdgeStream-GW</a></li>
+        <li><a href="projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="projet-netsentry-iot.html">NetSentry</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Changer de thème (clair / sombre)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Projet 1 du triptyque</span>
+        <h1>EdgeStream-GW</h1>
+        <p class="lede">Passerelle logicielle industrielle <strong>ultra-légère</strong> : pont
+          intelligent et résilient entre les nœuds de perception physiques (capteurs, compteurs,
+          automates) et le Cloud. Elle intercepte les flux temps réel, les traite localement et évite
+          les goulots d'étranglement en environnement industriel sévère.</p>
+        <div style="margin-top:16px">
+          <span class="status status-design"><span class="status-dot" aria-hidden="true"></span>Phase : conception / définition — code non commencé</span>
+        </div>
+      </div>
+
+      <!-- Fiche projet -->
+      <div class="grid grid-2" style="margin-bottom:40px">
+        <div class="card">
+          <h3>Fiche projet</h3>
+          <ul class="clean-list">
+            <li><strong>Développé par</strong> — Helveticore OÜ (Estonie)</li>
+            <li><strong>Cible matérielle</strong> — Puzhi ZU2CG / ZU3EG (Zynq UltraScale+), partition PS/PL</li>
+            <li><strong>Maturité</strong> — CMMI Level 3 « Defined »</li>
+            <li><strong>Document source</strong> — SDD IEEE 1016 (registre des documents)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Positionnement</h3>
+          <p class="muted">Efficience énergétique et optimisation de la bande passante pour les
+            réseaux de compteurs intelligents (<strong>Smart Grid</strong>). Positionnée dans la
+            « couche héros » d'un écosystème Edge à trois couches.</p>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <h2>KPIs d'impact</h2>
+      <div class="kpi-banner" style="margin-bottom:40px">
+        <div class="kpi">
+          <div class="kpi-value"><em>−75&nbsp;%</em></div>
+          <div class="kpi-label">de volume de données transmis vers le Cloud</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-value"><em>&lt;&nbsp;50&nbsp;ms</em></div>
+          <div class="kpi-label">latence d'actuation locale (boucle rapide, sans aller-retour Cloud)</div>
+        </div>
+      </div>
+
+      <!-- Pipeline -->
+      <h2>Pipeline modulaire</h2>
+      <p class="muted">Collecte → Normalisation → Analyse → Publication, découplé en couches :</p>
+      <div class="flow" aria-label="Pipeline de traitement EdgeStream-GW">
+        <div class="flow-step"><span class="fs-name">south-drivers</span><span class="fs-note">Collecte (REUSE)</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-name">protocol-adapters</span><span class="fs-note">Normalisation (BUILD)</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-name">edge-analytics</span><span class="fs-note">Réduction PS/PL</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-name">ingestion-core</span><span class="fs-note">Courtier central</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-name">northbound-publishers</span><span class="fs-note">MQTT / OPC UA</span></div>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom:40px">
+        <div class="card">
+          <h3>Les huit sous-projets</h3>
+          <ul class="clean-list">
+            <li><code>south-drivers/</code> — collecte Modbus RTU/TCP, DLMS/COSEM <span class="tag tag-teal">REUSE</span></li>
+            <li><code>protocol-adapters/</code> — normalisation en objet <code>Frame</code> (Fail-Fast) <span class="tag tag-red">BUILD</span></li>
+            <li><code>edge-analytics/</code> — filtrage matériel (PL) + agrégation logicielle (PS)</li>
+            <li><code>ingestion-core/</code> — courtier asynchrone central routant les <code>Frame</code></li>
+            <li><code>northbound-publishers/</code> — MQTT (Sparkplug B) / OPC UA vers Cloud et SCADA</li>
+            <li><code>local-action-engine/</code> — boucle locale &lt; 50 ms (détection seuil PL + dispatch PS)</li>
+            <li><code>store-and-forward/</code> — résilience hors-ligne (SQLite) et rejeu <span class="tag tag-teal">REUSE</span></li>
+            <li><code>deployment/</code> — conteneurisation Docker « zéro-configuration » et OTA</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Chemin rapide et file de sécurité</h3>
+          <p class="muted">En parallèle du flux principal, deux boucles latérales garantissent la
+            réactivité et la résilience :</p>
+          <ul class="clean-list">
+            <li><strong>Fast-path</strong> — <code>local-action-engine</code> déclenche un
+              <code>ActionCommand</code> en &lt; 50 ms sans dépendance au Cloud.</li>
+            <li><strong>File de sécurité nord</strong> — <code>store-and-forward</code> tamponne en
+              SQLite hors-ligne puis rejoue de façon séquentielle et limitée (throttling).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Exigences -->
+      <h2>Exigences</h2>
+      <p class="muted">Extraits consolidés de la SDD IEEE 1016 (domaine RDM). Les identifiants restent
+        alignés sur le document source.</p>
+      <div class="grid grid-2" style="margin-top:16px; margin-bottom:16px">
+        <div class="card">
+          <h3>Exigences cœur</h3>
+          <ul class="clean-list">
+            <li><strong>REQ-001a</strong> — réduction matérielle des données (PL) : filtrage de bruit et FFT en continu sur la trame FPGA.</li>
+            <li><strong>REQ-001b</strong> — réduction logicielle (PS) : agrégation par fenêtre temporelle (RMS, min/max, déduplication).</li>
+            <li><strong>REQ-002</strong> — résilience hors-ligne : tamponnage SQLite + rejeu séquentiel limité à la reconnexion.</li>
+            <li><strong>REQ-003</strong> — actuation &lt; 50 ms : boucle locale PS/PL sans dépendance au Cloud.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Exigences dérivées</h3>
+          <ul class="clean-list">
+            <li><strong>REQ-004</strong> — Fail-Fast : payload corrompu rejeté (<code>CorruptedPayloadError</code>), jamais « réparé ».</li>
+            <li><strong>REQ-005</strong> — déploiement zéro-configuration (pile Docker).</li>
+            <li><strong>REQ-006</strong> — mises à jour OTA sécurisées, sans arrêt de la collecte.</li>
+            <li><strong>REQ-007</strong> — interopérabilité nord : MQTT + Sparkplug B (Protobuf) et OPC UA (client-serveur + PubSub).</li>
+            <li><strong>REQ-008</strong> — empreinte embarquée compatible Zynq UltraScale+ (RAM / stockage légers).</li>
+          </ul>
+        </div>
+      </div>
+      <p class="muted">Hors périmètre : gestion du Cloud / back-office, et développement de piles
+        Modbus/DLMS propriétaires (réutilisées, cf. décision 1).</p>
+
+      <!-- Décisions -->
+      <h2 style="margin-top:40px">Décisions d'architecture (DAR)</h2>
+      <div style="margin-top:20px">
+        <div class="decision">
+          <p class="d-title">Décision 1 — Collecte de protocoles (South Drivers)</p>
+          <dl>
+            <dt>Verdict</dt><dd><span class="verdict verdict-reuse">REUSE</span> — <code>pymodbus</code>, Gurux DLMS</dd>
+            <dt>Justification</dt><dd>Reconstruire des piles Modbus/DLMS conformes n'apporte aucune valeur stratégique et expose à la non-conformité.</dd>
+            <dt>Exigence</dt><dd>REQ-004, REQ-008</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Décision 2 — Normalisation des données (Protocol Adapters)</p>
+          <dl>
+            <dt>Verdict</dt><dd><span class="verdict verdict-build">BUILD FROM SCRATCH</span></dd>
+            <dt>Justification</dt><dd>Les parseurs open source corrigent silencieusement les données erronées ; les adaptateurs maison lèvent <code>CorruptedPayloadError</code> et garantissent la qualité CMMI L3.</dd>
+            <dt>Exigence</dt><dd>REQ-004</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Décision 3 — Base du Store-and-Forward</p>
+          <dl>
+            <dt>Verdict</dt><dd><span class="verdict verdict-reuse">REUSE SQLite</span></dd>
+            <dt>Justification</dt><dd>MongoDB trop lourd pour les limites RAM du PS ; fichiers binaires à risque en cas de coupure ; SQLite est server-less, ACID et adapté à l'embarqué.</dd>
+            <dt>Exigence</dt><dd>REQ-002, REQ-008</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Décision 4 — Frontière de partitionnement HW/SW (Zynq UltraScale+)</p>
+          <dl>
+            <dt>Verdict</dt><dd><span class="verdict verdict-build">PS/PL SPLIT</span></dd>
+            <dt>Justification</dt><dd>Router les signaux haute fréquence via Linux introduit une latence OS non déterministe ; le PL garantit une détection sub-milliseconde, le PS ne routant que l'<code>ActionCommand</code> asynchrone.</dd>
+            <dt>Exigence</dt><dd>REQ-003</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Traçabilité -->
+      <h2 style="margin-top:40px">Matrice de traçabilité (RTM)</h2>
+      <div class="table-wrap" style="margin-top:16px">
+        <table>
+          <thead>
+            <tr><th>Exigence</th><th>Conception (§ SDD)</th><th>Composant (src/)</th><th>Vérification</th><th>KPI</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>REQ-001a</code></td><td>§4 Edge Analytics PL</td><td><code>edge-analytics/pl/</code></td><td>simulation RTL / HLS (FFT + filtre)</td><td>−75 % volume</td></tr>
+            <tr><td><code>REQ-001b</code></td><td>§4 Edge Analytics PS</td><td><code>edge-analytics/ps/</code></td><td>tests d'agrégation (TDD)</td><td>−75 % volume</td></tr>
+            <tr><td><code>REQ-002</code></td><td>§5.2 Store-and-Forward</td><td><code>store-and-forward/</code></td><td>coupure réseau simulée + rejeu</td><td>résilience</td></tr>
+            <tr><td><code>REQ-003</code></td><td>§3.4 &amp; §5.1 Action Engine</td><td><code>local-action-engine/{pl,ps}/</code></td><td>banc de latence &lt; 50 ms</td><td>&lt; 50 ms</td></tr>
+            <tr><td><code>REQ-004</code></td><td>§4 Protocol Adapters</td><td><code>protocol-adapters/</code></td><td>payloads corrompus (TDD)</td><td>qualité</td></tr>
+            <tr><td><code>REQ-005</code></td><td>§3.1 Conteneurisation</td><td><code>deployment/</code></td><td>déploiement docker-compose</td><td>zéro-config</td></tr>
+            <tr><td><code>REQ-006</code></td><td>§3.1 Conteneurisation</td><td><code>deployment/</code></td><td>test de mise à jour OTA</td><td>continuité</td></tr>
+            <tr><td><code>REQ-007</code></td><td>§3.2 Frontière nord</td><td><code>northbound-publishers/</code></td><td>Mosquitto + client OPC UA</td><td>interop IT/OT</td></tr>
+            <tr><td><code>REQ-008</code></td><td>§6 Décision 3</td><td><code>store-and-forward/</code></td><td>mesure RAM / stockage</td><td>empreinte</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="faint" style="margin-top:12px">Chaque ligne doit être vérifiée et cochée dans le
+        rapport de performance avant toute release.</p>
+
+      <!-- Jalons & risques -->
+      <h2 style="margin-top:40px">Jalons &amp; risques</h2>
+      <div class="grid grid-2" style="margin-top:16px">
+        <div class="card">
+          <h3>Jalons</h3>
+          <ul class="clean-list">
+            <li>1 · Banc d'essai virtualisé : émulation de 50 compteurs d'énergie (<code>testbench/</code>).</li>
+            <li>2 · Adapters + Edge Analytics PS : preuve du KPI de réduction de volume.</li>
+            <li>3 · Local Action Engine : preuve de latence &lt; 50 ms.</li>
+            <li>4 · Partitionnement PL (FPGA) + intégration PS/PL sur carte Puzhi.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Risques principaux (RSK)</h3>
+          <ul class="clean-list">
+            <li><strong>Déterminisme de latence PS/PL</strong> — mitigé par le partitionnement matériel (décision 4).</li>
+            <li><strong>Corruption de données lors de coupures secteur</strong> — mitigée par SQLite ACID (décision 3).</li>
+            <li><strong>Conformité protocolaire Modbus/DLMS</strong> — mitigée par la réutilisation de piles éprouvées (décision 1).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Banc d'essai -->
+      <h2 style="margin-top:40px">Banc d'essai virtualisé (VV)</h2>
+      <div class="grid grid-2" style="margin-top:16px">
+        <div class="card">
+          <h3>Émulation</h3>
+          <ul class="clean-list">
+            <li><strong>50 compteurs Modbus simultanés</strong> simulés localement (cadence réaliste, télémétrie + bruit).</li>
+            <li>Interfaces PS/PL simulées : contrat AXI + interruptions mockées (TDD des couches logicielles).</li>
+            <li>Courtier MQTT local (Eclipse Mosquitto) et client OPC UA pour la frontière nord.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Outillage prévu</h3>
+          <p class="muted" style="margin-bottom:8px"><code>pytest</code>, <code>hypothesis</code>,
+            <code>docker-compose</code>, simulateurs Modbus/DLMS, Mosquitto, client OPC UA.</p>
+          <p class="muted" style="margin-bottom:0">Mesures : latence (&lt; 50 ms), taux de réduction
+            (≥ 75 %), RAM/CPU/stockage des conteneurs — alimentent <code>performance/</code>.</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:32px">
+        <strong>État courant :</strong> l'ensemble des artefacts de conception est rédigé (exigences,
+        SDD, 4 décisions, RTM, jalons). Aucun code source n'est encore versionné — la prochaine étape
+        du plan est la mise en place du banc d'essai virtualisé (jalon 1).
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Société d'ingénierie IoT &amp; Edge Computing, enregistrée à Tallinn
+          (Estonie).</p>
+        <p class="faint">Registre : 17526982 · Fondée en 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Coordonnées</h3>
+        <ul>
+          <li>Harju maakond, Tallinn,<br>Kesklinna linnaosa,<br>Tartu mnt 67/1-13b, 10115</li>
+          <li><a href="mailto:haroudm@gmail.com">haroudm@gmail.com</a></li>
+          <li><a href="tel:+41766631857">+41 76 663 18 57</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="methode.html">Méthode</a></li>
+          <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> Helveticore OÜ — Tallinn, Estonie.</span>
+      <span>Site statique HTML/CSS/JS · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

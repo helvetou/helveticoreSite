@@ -1,0 +1,7 @@
+# État d'exécution de l'agent Codewhale — non versionné
+.codewhale/
+
+# Divers OS
+.DS_Store
+Thumbs.db
+*.log
