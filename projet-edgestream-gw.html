@@ -27,6 +27,8 @@
         <li><a href="projet-edgestream-gw.html" aria-current="page">EdgeStream-GW</a></li>
         <li><a href="projet-fog-crypto-core.html">Fog-Crypto</a></li>
         <li><a href="projet-netsentry-iot.html">NetSentry</a></li>
+        <li><a href="projet-geberlms.html">GeberLMS</a></li>
+        <li><a href="documentation.html">Docs</a></li>
       </ul>
     </nav>
     <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
@@ -47,7 +49,7 @@
           and the Cloud. It intercepts real-time streams, processes them locally and prevents
           bottlenecks in harsh industrial environments.</p>
         <div style="margin-top:16px">
-          <span class="status status-design"><span class="status-dot" aria-hidden="true"></span>Phase: design / definition — code not started</span>
+          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Phase: implementation — working, test-verified code</span>
         </div>
       </div>
 
@@ -214,6 +216,50 @@
             <dt>Requirement</dt><dd>REQ-003</dd>
           </dl>
         </div>
+        <div class="decision">
+          <p class="d-title">Decision 5 — First module for detailed specification</p>
+          <dl>
+            <dt>Verdict</dt><dd><strong>Protocol Adapters</strong> — pure <code>bytes → Frame</code>, TDD-friendly.</dd>
+            <dt>Rationale</dt><dd>No hardware/network/database dependency; defines the central <code>Frame</code> contract consumed downstream (mandated by Decision 2).</dd>
+            <dt>Requirement</dt><dd>REQ-004, REQ-008</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Decision 6 — Schema validation engine</p>
+          <dl>
+            <dt>Verdict</dt><dd><strong>Pydantic v2</strong> — strict mode, <code>extra="forbid"</code>.</dd>
+            <dt>Rationale</dt><dd>Type-safe, fast, first-class with pytest/hypothesis; strict bounded ranges.</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Decision 7 — First protocol to implement</p>
+          <dl>
+            <dt>Verdict</dt><dd><strong>Modbus RTU first</strong> (FC 03), then Modbus TCP, then DLMS/COSEM.</dd>
+            <dt>Rationale</dt><dd>Simplest and matches the 50-meter bench; <code>pymodbus</code> provides reference vectors (Decision 1).</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Decision 8 — TDD tooling</p>
+          <dl>
+            <dt>Verdict</dt><dd><strong>pytest + hypothesis + pydantic + pytest-cov + ruff</strong>.</dd>
+            <dt>Rationale</dt><dd><code>hypothesis</code> enforces the “no invalid <code>Frame</code>” invariant; <code>pytest-cov</code> for branch coverage.</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Decision 9 — DLMS/COSEM adapter</p>
+          <dl>
+            <dt>Verdict</dt><dd><strong>DEFER</strong> to a dedicated specification phase.</dd>
+            <dt>Rationale</dt><dd>A rushed parser would violate the Fail-Fast guarantees (HDLC vs COSEM-TCP, A-XDR, OBIS mapping remain to be framed).</dd>
+          </dl>
+        </div>
+        <div class="decision">
+          <p class="d-title">Decision 10 — Edge Analytics PS aggregation output</p>
+          <dl>
+            <dt>Verdict</dt><dd><strong>Primary + <code>.min</code>/<code>.max</code></strong> per quantity; reducer <code>rms</code>/<code>mean</code>/<code>last</code>.</dd>
+            <dt>Rationale</dt><dd>Keeps the canonical <code>Frame</code> stable; N frames → 1 realizes the −75% volume KPI.</dd>
+            <dt>Requirement</dt><dd>REQ-001b</dd>
+          </dl>
+        </div>
       </div>
 
       <!-- Traceability -->
@@ -245,10 +291,11 @@
         <div class="card">
           <h3>Milestones</h3>
           <ul class="clean-list">
-            <li>1 · Virtual test bench: emulation of 50 energy meters (<code>testbench/</code>).</li>
-            <li>2 · Adapters + Edge Analytics PS: proof of the volume-reduction KPI.</li>
-            <li>3 · Local Action Engine: proof of &lt; 50 ms latency.</li>
-            <li>4 · PL (FPGA) partitioning + PS/PL integration on the Puzhi board.</li>
+            <li>1 · Virtual test bench: 50-meter Modbus simulator — <strong>done</strong> (9 tests).</li>
+            <li>2 · Adapters + Edge Analytics PS — <strong>done</strong> (Modbus RTU/TCP → <code>Frame</code>, window aggregation + dedup; 57 tests).</li>
+            <li>3 · End-to-end −75% volume KPI measurement — <strong>in progress</strong>.</li>
+            <li>4 · Local Action Engine: proof of &lt; 50 ms latency.</li>
+            <li>5 · PL (FPGA) partitioning + PS/PL integration on the Puzhi board.</li>
           </ul>
         </div>
         <div class="card">
@@ -282,10 +329,12 @@
       </div>
 
       <div class="note" style="margin-top:32px">
-        <strong>Current state:</strong> all design artifacts are drafted (requirements, SDD,
-        4 decisions, RTM, milestones), including the PS/PL split of <code>edge-analytics</code> and
-        <code>local-action-engine</code>. No source code is versioned yet — the next step in the
-        plan is the virtual test bench (milestone 1).
+        <strong>Current state:</strong> three components are implemented test-first and verified —
+        <code>protocol-adapters</code> (Modbus RTU + TCP into the canonical <code>Frame</code>),
+        <code>edge-analytics/ps</code> (window aggregation + dedup) and the 50-meter Modbus virtual
+        test bench. 66 automated tests pass (100% coverage on the adapters and Edge Analytics PS).
+        Next: end-to-end −75% volume KPI measurement, then the DLMS adapter (Decision 9), Ingestion
+        Core, Northbound Publishers, Store-and-Forward, Local Action Engine and the PL (FPGA) layer.
       </div>
     </div>
   </section>
@@ -314,6 +363,8 @@
           <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
           <li><a href="projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
           <li><a href="projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="projet-geberlms.html">GeberLMS</a></li>
+          <li><a href="documentation.html">Documentation</a></li>
         </ul>
       </div>
     </div>

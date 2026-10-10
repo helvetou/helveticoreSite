@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Helveticore — IoT &amp; Edge Computing Engineering, Tallinn</title>
-  <meta name="description" content="Helveticore OÜ, an engineering company based in Tallinn: proprietary technology bricks for industrial IoT, Edge Computing and GreenTech. Portfolio: EdgeStream-GW, Fog-Crypto Core, NetSentry-IoT.">
+  <meta name="description" content="Helveticore OÜ, an engineering company based in Tallinn: proprietary technology bricks for industrial IoT, Edge Computing and GreenTech. Portfolio: EdgeStream-GW, Fog-Crypto Core, NetSentry-IoT, and the GeberLMS learning platform.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -27,6 +27,8 @@
         <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
         <li><a href="projet-fog-crypto-core.html">Fog-Crypto</a></li>
         <li><a href="projet-netsentry-iot.html">NetSentry</a></li>
+        <li><a href="projet-geberlms.html">GeberLMS</a></li>
+        <li><a href="documentation.html">Docs</a></li>
       </ul>
     </nav>
     <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
@@ -148,6 +150,38 @@
     </div>
   </section>
 
+  <!-- Product platform -->
+  <section class="section" id="platform">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Product line</span>
+        <h2>GeberLMS — the learning platform</h2>
+        <p class="lede">Alongside the IoT triptych, a separate product line: the Learning
+          Management System used to sell the courses produced by Helveticore OÜ.</p>
+      </div>
+      <div class="grid grid-2">
+        <a class="card card-link" href="projet-geberlms.html">
+          <span class="tag tag-teal">SvelteKit · Cloudflare</span>
+          <h3>🎓 GeberLMS</h3>
+          <p class="muted">Catalogue, enrollment, coupons, VAT/OSS invoicing, e-testing and
+            LLM-generated quizzes — admin / tutor / learner roles, in FR · EN · AR · DE.</p>
+          <div class="kpis">
+            <span class="tag">201 tests green</span>
+            <span class="tag">FR · EN · AR · DE</span>
+          </div>
+          <span class="arrow">Discover →</span>
+        </a>
+        <a class="card card-link" href="documentation.html">
+          <span class="tag tag-amber">Docs &amp; reports</span>
+          <h3>📚 Documentation &amp; technical reports</h3>
+          <p class="muted">SDD, specifications, technical reports and prototype manuals for
+            EdgeStream-GW and GeberLMS — linked to the source documents.</p>
+          <span class="arrow">Browse →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Current state -->
   <section class="section">
     <div class="container">
@@ -155,12 +189,18 @@
         <span class="eyebrow">Transparency</span>
         <h2>Current repository state</h2>
       </div>
-      <div class="grid grid-3">
+      <div class="grid grid-2">
         <div class="card">
           <h3>EdgeStream-GW</h3>
-          <span class="status status-design"><span class="status-dot" aria-hidden="true"></span>Design / definition</span>
-          <p class="muted" style="margin-bottom:0">Requirements (REQ-001 → REQ-008), IEEE 1016 SDD,
-            traceability matrix and 4 architecture decisions drafted. Source code not started yet.</p>
+          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Implementation</span>
+          <p class="muted" style="margin-bottom:0">Protocol Adapters (Modbus RTU/TCP), Edge Analytics PS
+            and the 50-meter test bench implemented test-first — 66 tests green, 100% coverage.</p>
+        </div>
+        <div class="card">
+          <h3>GeberLMS</h3>
+          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Prototype</span>
+          <p class="muted" style="margin-bottom:0">Working SvelteKit + Cloudflare prototype: catalogue,
+            enrollment, coupons, VAT/OSS invoicing, e-testing, LLM quizzes, i18n — 201 tests green.</p>
         </div>
         <div class="card">
           <h3>Fog-Crypto Core</h3>
@@ -177,8 +217,9 @@
       </div>
       <div class="note" style="margin-top:24px">
         <strong>State note:</strong> this site faithfully reflects the content of the
-        <code>EdgeStream-GW</code> repository as of today. The portfolio is currently in the
-        documentation and design phase — no source code is versioned in the repositories yet.
+        <code>EdgeStream-GW</code> and <code>GeberLMS</code> repositories as of today. EdgeStream-GW
+        and GeberLMS have working, test-verified code; Fog-Crypto Core and NetSentry-IoT remain at
+        the specification stage.
       </div>
     </div>
   </section>
@@ -232,6 +273,8 @@
           <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
           <li><a href="projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
           <li><a href="projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="projet-geberlms.html">GeberLMS</a></li>
+          <li><a href="documentation.html">Documentation</a></li>
         </ul>
       </div>
     </div>

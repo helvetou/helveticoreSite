@@ -555,6 +555,12 @@ h3 {
   border: 1px solid var(--line-strong);
 }
 
+.status-build {
+  color: var(--teal);
+  background: var(--teal-soft);
+  border: 1px solid color-mix(in srgb, var(--teal) 40%, var(--line));
+}
+
 /* ---------- KPI blocks ---------- */
 .kpi-banner {
   display: grid;

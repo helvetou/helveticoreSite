@@ -5,3 +5,8 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Fichiers volumineux / sauvegardes - non versionnés
+presentations/
+docs/.ks4w-backups/
+docs/Domain_Transfer_Hostinger_to_Cloudflare.docx
