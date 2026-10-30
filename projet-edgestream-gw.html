@@ -14,7 +14,7 @@
     <a class="brand" href="index.html" aria-label="Helveticore — home">
       <span class="brand-mark" aria-hidden="true">◈</span>
       <span class="brand-name">Helveticore</span>
-      <span class="brand-sub">IoT · Edge · GreenTech</span>
+      <span class="brand-sub">Consulting · AI · Edge</span>
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
       <span class="nav-toggle-label">Menu</span>
@@ -49,7 +49,7 @@
           and the Cloud. It intercepts real-time streams, processes them locally and prevents
           bottlenecks in harsh industrial environments.</p>
         <div style="margin-top:16px">
-          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Phase: implementation — working, test-verified code</span>
+          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Phase: implementation — Milestone 1 sealed (KPI −96% measured)</span>
         </div>
       </div>
 
@@ -76,8 +76,8 @@
       <h2>Impact KPIs</h2>
       <div class="kpi-banner" style="margin-bottom:40px">
         <div class="kpi">
-          <div class="kpi-value"><em>−75&nbsp;%</em></div>
-          <div class="kpi-label">of data volume transmitted to the Cloud</div>
+          <div class="kpi-value"><em>−96&nbsp;%</em></div>
+          <div class="kpi-label">northbound volume reduction measured (M1) — target ≥ 75%</div>
         </div>
         <div class="kpi">
           <div class="kpi-value"><em>&lt;&nbsp;50&nbsp;ms</em></div>
@@ -289,13 +289,14 @@
       <h2 style="margin-top:40px">Milestones &amp; risks</h2>
       <div class="grid grid-2" style="margin-top:16px">
         <div class="card">
-          <h3>Milestones</h3>
+          <h3>Milestones (MILESTONES.md)</h3>
           <ul class="clean-list">
-            <li>1 · Virtual test bench: 50-meter Modbus simulator — <strong>done</strong> (9 tests).</li>
-            <li>2 · Adapters + Edge Analytics PS — <strong>done</strong> (Modbus RTU/TCP → <code>Frame</code>, window aggregation + dedup; 57 tests).</li>
-            <li>3 · End-to-end −75% volume KPI measurement — <strong>in progress</strong>.</li>
-            <li>4 · Local Action Engine: proof of &lt; 50 ms latency.</li>
-            <li>5 · PL (FPGA) partitioning + PS/PL integration on the Puzhi board.</li>
+            <li>M0 · Baseline — <strong>done</strong> (66 tests pass; technical report regenerable).</li>
+            <li>M1 · Volume-reduction KPI — <strong>done</strong> (96.07% measured, target ≥ 75%).</li>
+            <li>M2 · Ingestion Core (async broker, TDD) — <strong>next</strong>.</li>
+            <li>M3–M6 · Northbound MQTT + Sparkplug B, Store-and-Forward SQLite, Local Action Engine (&lt; 50 ms), Deployment.</li>
+            <li>M7 · DLMS/COSEM adapter (Decision 9) — M8 · Edge Analytics PL + PS/PL integration.</li>
+            <li>M9 · Fog-Crypto Core spec — M10 · NetSentry-IoT spec.</li>
           </ul>
         </div>
         <div class="card">
@@ -332,9 +333,9 @@
         <strong>Current state:</strong> three components are implemented test-first and verified —
         <code>protocol-adapters</code> (Modbus RTU + TCP into the canonical <code>Frame</code>),
         <code>edge-analytics/ps</code> (window aggregation + dedup) and the 50-meter Modbus virtual
-        test bench. 66 automated tests pass (100% coverage on the adapters and Edge Analytics PS).
-        Next: end-to-end −75% volume KPI measurement, then the DLMS adapter (Decision 9), Ingestion
-        Core, Northbound Publishers, Store-and-Forward, Local Action Engine and the PL (FPGA) layer.
+        test bench. 66 automated tests pass (99% coverage on the adapters, 100% on Edge Analytics
+        PS). Milestone 1 is sealed: the end-to-end −75% volume KPI is measured at <strong>96.07%</strong>.
+        Next: Ingestion Core (M2), then DLMS (M7) and the PL/FPGA layer (M8).
       </div>
     </div>
   </section>
@@ -345,7 +346,7 @@
     <div class="footer-grid">
       <div class="footer-col">
         <h3>Helveticore OÜ</h3>
-        <p class="muted">IoT &amp; Edge Computing engineering company, registered in Tallinn
+        <p class="muted">Technology consulting — critical software, industrial AI &amp; edge engineering. Registered in Tallinn
           (Estonia).</p>
         <p class="faint">Registry: 17526982 · Founded in 2026</p>
       </div>

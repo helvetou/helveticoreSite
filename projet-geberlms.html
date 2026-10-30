@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GeberLMS — Learning Management System · Helveticore</title>
-  <meta name="description" content="GeberLMS: the Learning Management System used by Helveticore OÜ to sell its courses. SvelteKit + Cloudflare (Workers/Pages, D1, R2, Workers AI), TypeScript strict, 201 tests green, FR · EN · AR · DE.">
+  <meta name="description" content="GeberLMS: the Learning Management System used by Helveticore OÜ to sell its courses. SvelteKit + Cloudflare (Workers/Pages, D1, R2, Workers AI), TypeScript strict, 206 tests green, FR · EN · AR · DE.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -14,7 +14,7 @@
     <a class="brand" href="index.html" aria-label="Helveticore — home">
       <span class="brand-mark" aria-hidden="true">◈</span>
       <span class="brand-name">Helveticore</span>
-      <span class="brand-sub">IoT · Edge · GreenTech</span>
+      <span class="brand-sub">Consulting · AI · Edge</span>
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
       <span class="nav-toggle-label">Menu</span>
@@ -49,13 +49,13 @@
           e-testing and LLM-generated quizzes — with admin, tutor and learner roles, in four
           interface languages.</p>
         <div style="margin-top:16px">
-          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Phase: prototype — 201 tests green</span>
+          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Phase: prototype — 206 tests green</span>
         </div>
       </div>
 
       <div class="kpi-banner" style="margin-bottom:40px">
         <div class="kpi">
-          <div class="kpi-value"><em>201</em></div>
+          <div class="kpi-value"><em>206</em></div>
           <div class="kpi-label">Vitest tests green (pure domain layer, TDD)</div>
         </div>
         <div class="kpi">
@@ -70,7 +70,7 @@
           <ul class="clean-list">
             <li><strong>Developed by</strong> — Helveticore OÜ (Estonia)</li>
             <li><strong>Repository</strong> — <code>helvetou/GeberLMS</code> (private)</li>
-            <li><strong>Stack</strong> — SvelteKit (adapter-cloudflare) · TypeScript strict</li>
+            <li><strong>Stack</strong> — SvelteKit (adapter-cloudflare) · TypeScript strict · shadcn-svelte · Tailwind v4</li>
             <li><strong>Infrastructure</strong> — Cloudflare Workers/Pages · D1 (Drizzle) · R2 · Workers AI</li>
             <li><strong>Payments</strong> — Payoneer + Revolut (no Stripe)</li>
             <li><strong>Process</strong> — CMMI-DEV L3 (SPEC-001…003)</li>
@@ -80,7 +80,8 @@
           <h3>Architecture at a glance</h3>
           <ul class="clean-list">
             <li><strong>Runtime</strong> — the whole app runs on a single Cloudflare Worker; static assets served by Pages.</li>
-            <li><strong>Data</strong> — D1 (SQLite) via Drizzle ORM: 16 tables, migrations <code>0001_init</code> → <code>0005_quiz_questions</code>.</li>
+            <li><strong>UI</strong> — shadcn-svelte + Tailwind CSS v4 (component library, light/dark mode).</li>
+            <li><strong>Data</strong> — D1 (SQLite) via Drizzle ORM: 15 tables, migrations <code>0001_init</code> → <code>0006_course_metadata</code>.</li>
             <li><strong>Files</strong> — R2 bucket <code>geberlms-files</code> for learner uploads and course resources.</li>
             <li><strong>Auth</strong> — sessions on Workers + accounts in D1; PBKDF2-SHA256 (Web Crypto).</li>
             <li><strong>Money</strong> — integer cents only; discount on the net price, then VAT at the buyer's country (OSS).</li>
@@ -156,7 +157,7 @@
           <h3>Functional areas</h3>
           <ul class="clean-list">
             <li><strong>Accounts &amp; access</strong> — roles, guardianship, single-payer enrollment (FR-01…FR-07).</li>
-            <li><strong>Catalogue</strong> — course / module / lesson / resource CRUD, reversible hide (FR-10…FR-14).</li>
+            <li><strong>Catalogue</strong> — course / module / lesson / resource CRUD, reversible hide, public catalogue flag (FR-10…FR-14).</li>
             <li><strong>Progress</strong> — learner progress, dashboards, activity journal (FR-20…FR-23).</li>
             <li><strong>Uploads</strong> — R2 document deposits (FR-24).</li>
             <li><strong>E-testing</strong> — quiz, optional timing, auto-correction (FR-30); LLM quiz generation (FR-31).</li>
@@ -180,8 +181,11 @@
         <div class="card">
           <h3>Remaining build items</h3>
           <ul class="clean-list">
+            <li><strong>Coupon toggle</strong> — enable/disable coupons (only creation is wired today).</li>
             <li><strong>Anti-copy</strong> — on-the-fly rendering, no mass export, watermark, quotas (NFR-10).</li>
+            <li><strong>LLM budget guard</strong> — monthly spend tracking/alert (NFR-06).</li>
             <li><strong>Payoneer mode</strong> — semi-manual payment request vs checkout to be confirmed.</li>
+            <li><strong>Local dev</strong> — document the Cloudflare token prerequisite (<code>npm run dev</code> needs <code>CLOUDFLARE_API_TOKEN</code>).</li>
             <li><strong>Dependency hygiene</strong> — clear the 5 dev-dependency <code>npm audit</code> findings.</li>
           </ul>
         </div>
@@ -190,7 +194,7 @@
           <ul class="clean-list">
             <li><strong>TVA / OSS</strong> — re-validate rates against an official source; validate EU VAT registration with an Estonian accountant.</li>
             <li><strong>RGPD</strong> — consent, minimisation, right to erasure.</li>
-            <li><strong>Token <code>HELVETO_PAT</code></strong> — expires 2026-10-21, to renew.</li>
+            <li><strong>Token <code>HELVETO_PAT</code></strong> — expired 2026-10-21, to renew.</li>
           </ul>
         </div>
       </div>
@@ -198,8 +202,8 @@
       <div class="note" style="margin-top:32px">
         <strong>Current state:</strong> working prototype — the pure domain layer (20 modules),
         the Cloudflare server layer (D1/Drizzle, R2, auth, payments) and the admin / tutor /
-        learner pages are implemented test-first. The full suite passes (201 tests). Detailed
-        documents live in <a href="documentation.html">Documentation &amp; technical reports</a>.
+        learner pages (shadcn-svelte / Tailwind UI) are implemented test-first. The full suite
+        passes (206 tests). Detailed documents live in <a href="documentation.html">Documentation &amp; technical reports</a>.
       </div>
     </div>
   </section>
@@ -210,7 +214,7 @@
     <div class="footer-grid">
       <div class="footer-col">
         <h3>Helveticore OÜ</h3>
-        <p class="muted">IoT &amp; Edge Computing engineering company, registered in Tallinn
+        <p class="muted">Technology consulting — critical software, industrial AI &amp; edge engineering. Registered in Tallinn
           (Estonia).</p>
         <p class="faint">Registry: 17526982 · Founded in 2026</p>
       </div>
