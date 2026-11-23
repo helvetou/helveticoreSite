@@ -19,7 +19,7 @@ nothing is invented.
 ├── projet-fog-crypto-core.html       Fog-Crypto Core — FPGA accelerator
 ├── projet-netsentry-iot.html         NetSentry-IoT — cybersecurity probe
 ├── documentation.html                Technical reports & source documents
-├── blog/                             Blog — technical notes, LinkedIn-style
+├── blog/                             Blog — technical notes
 │   ├── index.html                    Article index
 │   └── <slug>.html                   Individual articles
 ├── assets/
