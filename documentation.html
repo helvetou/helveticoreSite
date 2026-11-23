@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Documentation &amp; technical reports · Helveticore</title>
-  <meta name="description" content="Documentation and technical reports for the Helveticore portfolio: EdgeStream-GW SDD and technical report, GeberLMS specifications and manuals — linked to the source documents.">
+  <meta name="description" content="Documentation and technical reports for the Helveticore IIoT portfolio: EdgeStream-GW requirements, design, decisions, traceability, KPI report and tutorial — published as-is from the source repository.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -14,7 +14,7 @@
     <a class="brand" href="index.html" aria-label="Helveticore — home">
       <span class="brand-mark" aria-hidden="true">◈</span>
       <span class="brand-name">Helveticore</span>
-      <span class="brand-sub">Consulting · AI · Edge</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
       <span class="nav-toggle-label">Menu</span>
@@ -23,11 +23,12 @@
     <nav class="site-nav" id="site-nav" aria-label="Main navigation">
       <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="methode.html">Method</a></li>
         <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="projet-netsentry-iot.html">NetSentry-IoT</a></li>
         <li><a href="projet-fog-crypto-core.html">Fog-Crypto</a></li>
-        <li><a href="projet-netsentry-iot.html">NetSentry</a></li>
-        <li><a href="projet-geberlms.html">GeberLMS</a></li>
+        <li><a href="blog/index.html">Insights</a></li>
+        <li><a href="methode.html">Method</a></li>
         <li><a href="documentation.html" aria-current="page">Docs</a></li>
       </ul>
     </nav>
@@ -45,14 +46,14 @@
         <span class="eyebrow">Source documents</span>
         <h1>Documentation &amp; technical reports</h1>
         <p class="lede">The design, specification and reporting documents for
-          <strong>EdgeStream-GW</strong> and <strong>GeberLMS</strong>, published as-is from the
-          source repositories. PDFs open in the browser; Word and Markdown files open as
-          downloads or plain text.</p>
+          <strong>EdgeStream-GW</strong>, published as-is from the source repository. PDFs open in
+          the browser; Markdown files open as plain text.</p>
       </div>
 
       <!-- EdgeStream-GW -->
-      <h2 style="margin-top:8px">EdgeStream-GW</h2>
+      <h2 style="margin-top:8px">EdgeStream-GW — gateway &amp; edge analytics</h2>
       <div class="card" style="margin-top:16px">
+        <h3 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-faint)">Reference documents</h3>
         <ul class="clean-list">
           <li>
             <a href="docs/edgestream-gw/EdgeStream-GW_SDD_IEEE1016.pdf">System &amp; Software Design Description</a>
@@ -63,15 +64,81 @@
           <li>
             <a href="docs/edgestream-gw/Helveticore_Strategic_Portfolio.pdf">Helveticore projects — strategic portfolio</a>
             <span class="tag tag-red">PDF</span>
-            <p class="muted" style="margin:6px 0 0">The 2026–2027 strategy behind the triptych
+            <p class="muted" style="margin:6px 0 0">The 2026–2027 strategy behind the IIoT triptych
               (EdgeStream-GW, Fog-Crypto Core, NetSentry-IoT).</p>
           </li>
           <li>
-            <a href="docs/edgestream-gw/Helveticore_EdgeStream-GW_Technical_Report_2026-10-28.docx">Technical Report &amp; Prototype Manual</a>
-            <span class="tag tag-teal">DOCX</span>
-            <p class="muted" style="margin:6px 0 0">Implementation status (2026-10-28) — what has
-              been built and a hands-on manual to run the prototype.</p>
+            <a href="docs/edgestream-gw/EdgeStream-rapport-technique-11nov2026.md">Technical report (2026-11-11)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Milestones 0–1, verification evidence, KPI
+              measurement and roadmap — the current reference report.</p>
           </li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h3 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-faint)">Requirements, design &amp; decisions</h3>
+        <ul class="clean-list">
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGWREQ-11nov2026.md">Requirements (REQ)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Core and derived requirements, module
+              requirements (REQ-004.1…REQ-004.6), industrial constraints and out-of-scope.</p>
+          </li>
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGWRTM-11nov2026.md">Requirements traceability matrix (RTM)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Requirement → design → component → verification
+              → KPI mapping.</p>
+          </li>
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGWSDD-11nov2026.md">Design summary (SDD)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Maintained Markdown summary — the source of
+              truth as development proceeds.</p>
+          </li>
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGWdecision-log-11nov2026.md">Decision log (DAR)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Ten architecture decisions with criteria,
+              options and rationale (Build vs Reuse).</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h3 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-faint)">Verification &amp; status</h3>
+        <ul class="clean-list">
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGW-status-11nov2026.md">Status snapshot (2026-11-11)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Done / next state, verification evidence and
+              roadmap at a glance.</p>
+          </li>
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGWvolume_reduction_report-11nov2026.md">Volume-reduction KPI report</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">End-to-end measurement: 96.07 % northbound
+              volume reduction (target ≥ 75 %), 50 meters × 300 s × 5 seeds.</p>
+          </li>
+          <li>
+            <a href="docs/edgestream-gw/EdgeStreamGWSBOM-11nov2026.md">Software Bill of Materials</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Build-vs-reuse inventory of every source and
+              test file (Milestone 1).</p>
+          </li>
+          <li>
+            <a href="docs/edgestream-gw/audit-2026-10-28.md">Code audit report (2026-10-28)</a>
+            <span class="tag tag-amber">Markdown</span>
+            <p class="muted" style="margin:6px 0 0">Static conformance audit: Fail-Fast, strict
+              schema, coverage (99 % adapters / 100 % analytics PS) and the measured 96.07 % KPI.</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h3 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-faint)">Process &amp; guides</h3>
+        <ul class="clean-list">
           <li>
             <a href="docs/edgestream-gw/cmmi-charter.md">CMMI Level 3 charter</a>
             <span class="tag tag-amber">Markdown</span>
@@ -79,109 +146,24 @@
               macro-architecture, TDD micro-architecture, CBSE integration.</p>
           </li>
           <li>
-            <a href="docs/edgestream-gw/STATUS.md">Portfolio current state (STATUS)</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Done / in-progress / next-steps snapshot
-              (2026-09-24) — superseded by MILESTONES.md below.</p>
-          </li>
-          <li>
             <a href="docs/edgestream-gw/MILESTONES.md">Milestone roadmap (MILESTONES)</a>
             <span class="tag tag-amber">Markdown</span>
             <p class="muted" style="margin:6px 0 0">Sequential checkpoints M0–M10 with exit criteria —
-              M0 (baseline) and M1 (−75% KPI) sealed.</p>
+              M0 (baseline) and M1 (−75 % KPI) sealed.</p>
           </li>
           <li>
-            <a href="docs/edgestream-gw/audit-2026-10-28.md">Code audit report (2026-10-28)</a>
+            <a href="docs/edgestream-gw/EdgeStreamGWtutorial-milestone-1-11nov2026.md">Tutorial — Milestone 1 (beginner edition)</a>
             <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Static conformance audit: Fail-Fast, strict schema,
-              coverage (99% adapters / 100% analytics PS) and the measured 96.07% KPI.</p>
-          </li>
-          <li>
-            <a href="docs/edgestream-gw/SBOM.md">Software Bill of Materials</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Build-vs-reuse inventory of every source and test
-              file (Milestone 1).</p>
-          </li>
-          <li>
-            <a href="docs/edgestream-gw/volume_reduction_report.md">Volume-reduction KPI report</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">End-to-end measurement: 96.07% northbound volume
-              reduction (target ≥ 75%), 50 meters × 300 s × 5 seeds.</p>
-          </li>
-          <li>
-            <a href="docs/edgestream-gw/EdgeStream-GW_Tutorial_2026-09-24.md">EdgeStream-GW tutorial</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Workflow and code walkthrough (English,
-              2026-09-24).</p>
-          </li>
-          <li>
-            <a href="docs/edgestream-gw/tutorial-milestone-1.md">Tutorial — Milestone 1</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Walkthrough up to Milestone 1 (KPI measured).</p>
-          </li>
-        </ul>
-      </div>
-
-      <!-- GeberLMS -->
-      <h2 style="margin-top:40px">GeberLMS</h2>
-      <div class="card" style="margin-top:16px">
-        <ul class="clean-list">
-          <li>
-            <a href="docs/geberlms/GeberLMS_Technical_Report.docx">Technical Report &amp; Prototype Manual</a>
-            <span class="tag tag-teal">DOCX</span>
-            <p class="muted" style="margin:6px 0 0">Core concepts, implemented scope and an
-              install / run / operate manual for the GeberLMS prototype.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/GeberLMS_Architecture_Manual.docx">Architecture &amp; Technology Stack Manual</a>
-            <span class="tag tag-teal">DOCX</span>
-            <p class="muted" style="margin:6px 0 0">How the concepts are realised in code —
-              Cloudflare Worker, SvelteKit, D1/Drizzle, R2, auth — plus a glossary.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/spec/01-exigences.md">Requirements specification (SPEC-001)</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Functional (FR), non-functional (NFR) and
-              business rules (BR) for the platform.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/spec/02-architecture.md">Architecture (SPEC-002)</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">High-level decisions and components — D1, R2,
-              KV, Payoneer, Workers AI / DeepSeek.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/spec/03-processus-cmmi3.md">Process — CMMI-DEV L3 (SPEC-003)</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">TDD loop, peer reviews, traceability and
-              measurement.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/README.md">Project README</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Prerequisites, commands, local D1 setup and
-              Cloudflare deployment.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/audit-2026-10-14.md">Conformance audit (2026-10-14)</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Independent audit of the v0.1.0 test manual —
-              206 tests green across 21 files; findings on coupons, dev setup and compliance.</p>
-          </li>
-          <li>
-            <a href="docs/geberlms/manual-dev.md">Test &amp; dev manual v0.1.0</a>
-            <span class="tag tag-amber">Markdown</span>
-            <p class="muted" style="margin:6px 0 0">Local D1 setup, test accounts, automatic checks
-              and the shadcn-svelte / Tailwind v4 frontend stack.</p>
+            <p class="muted" style="margin:6px 0 0">Plain-language walkthrough up to Milestone 1,
+              with code and a glossary.</p>
           </li>
         </ul>
       </div>
 
       <div class="note" style="margin-top:32px">
         <strong>Publishing note:</strong> administrative documents that contain personal or
-        banking data (the Estonian business register extracts and the Payoneer → Revolut capture)
-        are intentionally kept out of the published site. Only engineering documents and technical
-        reports are reproduced here.
+        banking data are intentionally kept out of the published site. Only engineering documents
+        and technical reports are reproduced here.
       </div>
     </div>
   </section>
@@ -192,7 +174,7 @@
     <div class="footer-grid">
       <div class="footer-col">
         <h3>Helveticore OÜ</h3>
-        <p class="muted">Technology consulting — critical software, industrial AI &amp; edge engineering. Registered in Tallinn
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
           (Estonia).</p>
         <p class="faint">Registry: 17526982 · Founded in 2026</p>
       </div>
@@ -206,11 +188,12 @@
         <h3>Navigation</h3>
         <ul>
           <li><a href="index.html">Home</a></li>
-          <li><a href="methode.html">Method</a></li>
           <li><a href="projet-edgestream-gw.html">EdgeStream-GW</a></li>
-          <li><a href="projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="projet-smart-maintenance.html">Smart Maintenance</a></li>
           <li><a href="projet-netsentry-iot.html">NetSentry-IoT</a></li>
-          <li><a href="projet-geberlms.html">GeberLMS</a></li>
+          <li><a href="projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="blog/index.html">Insights</a></li>
+          <li><a href="methode.html">Method</a></li>
           <li><a href="documentation.html">Documentation</a></li>
         </ul>
       </div>

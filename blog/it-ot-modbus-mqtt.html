@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT/OT convergence: securing Modbus flows over MQTT · Helveticore Insights</title>
+  <meta name="description" content="Why bridging Modbus (OT) to MQTT (IT) naively is risky, and how a strict Frame contract plus Sparkplug B namespaces closes the gap.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../index.html" aria-label="Helveticore — home">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="../projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        <li><a href="../projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="index.html" aria-current="page">Insights</a></li>
+        <li><a href="../methode.html">Method</a></li>
+        <li><a href="../documentation.html">Docs</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <article class="article-body">
+        <a class="article-back" href="index.html">← All articles</a>
+        <header class="article-header">
+          <span class="tag tag-teal">IIoT</span>
+          <h1>IT/OT convergence: securing Modbus flows over MQTT</h1>
+          <div class="article-meta">
+            <span>By Malek Haroud</span><span>·</span>
+            <time datetime="2026-11-23">2026-11-23</time><span>·</span>
+            <span>4 min read</span>
+          </div>
+        </header>
+        <p class="lead">The operational floor speaks Modbus. The cloud speaks MQTT. The
+          hard part is not the protocol — it is the trust boundary you draw between the two.</p>
+
+        <h2>Two worlds, two assumptions</h2>
+        <p>On the OT side, Modbus RTU/TCP was designed for a trusted serial or LAN segment:
+          no authentication, no encryption, a flat register model. On the IT side, MQTT is a
+          publish/subscribe transport that scales well but does not secure itself either. The
+          moment you bridge the two, you inherit both gaps at once.</p>
+        <p>The naive integration — read a register, wrap it in JSON, publish it — creates a path
+          where a corrupted packet or a spoofed device flows straight into the data lake. That is
+          the exact failure mode an IIoT gateway must eliminate.</p>
+
+        <h2>Normalize, then publish</h2>
+        <p>EdgeStream-GW solves this with a strict internal contract, the <code>Frame</code>.
+          Every protocol adapter turns raw bytes into a validated <code>Frame</code> or fails
+          fast with a structured <code>CorruptedPayloadError</code>. Nothing invalid crosses the
+          boundary, and nothing is silently &ldquo;repaired&rdquo;.</p>
+        <p>Only after normalization does the gateway publish northbound. For MQTT we use
+          <strong>Sparkplug B</strong>, which adds the industrial semantics plain MQTT lacks:
+          namespaces, device states (birth/death), and a Protobuf payload. For SCADA, OPC UA
+          provides the equivalent client/server + PubSub story. The key principle: the north
+          boundary speaks industrial standards, not ad-hoc JSON.</p>
+
+        <h2>Three security seams to design now</h2>
+        <ul>
+          <li><strong>TLS on the north link</strong> — encryption and server authentication
+            between the gateway and the broker.</li>
+          <li><strong>Device authentication</strong> — each meter or PLC proves who it is before
+            its telemetry is trusted.</li>
+          <li><strong>Keys in hardware</strong> — long-lived credentials belong in a hardware
+            keystore (that is the role of Fog-Crypto Core), not in a text file on the flash.</li>
+        </ul>
+
+        <p>The takeaway: IT/OT convergence is not a wiring problem, it is a <em>contract</em>
+          problem. A strict <code>Frame</code>, Fail-Fast parsing, and Sparkplug B / OPC UA
+          publication give you a boundary you can reason about — and audit.</p>
+
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="../projet-smart-maintenance.html">Smart Maintenance</a></li>
+          <li><a href="../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="../projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="index.html">Insights</a></li>
+          <li><a href="../methode.html">Method</a></li>
+          <li><a href="../documentation.html">Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span><span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -3,26 +3,34 @@
 Website for **Helveticore OÜ** (Tallinn, Estonia). Static, framework-free, no build step:
 plain HTML + CSS + JavaScript only, ready to be published as-is on **Cloudflare Pages**.
 
-The content reflects the current state of the [`../EdgeStream-GW`](../EdgeStream-GW)
-repository as of the generation date. Nothing is invented: the project cards, KPIs,
-requirements, decisions and milestones are extracted from that repository.
+The site positions Helveticore as an **IoT & IIoT** consultancy: edge gateways
+(EdgeStream-GW), industrial AI for smart maintenance, IIoT security (NetSentry-IoT) and FPGA
+acceleration (Fog-Crypto Core). Project content is extracted from the source repositories —
+nothing is invented.
 
 ## Structure
 
 ```text
 .
-├── index.html                     Home (company, triptych, current state, contact)
-├── methode.html                   CMMI Level 3 methodology
-├── projet-edgestream-gw.html      EdgeStream-GW — detailed current state
-├── projet-fog-crypto-core.html    Fog-Crypto Core
-├── projet-netsentry-iot.html      NetSentry-IoT
+├── index.html                        Home (IoT & IIoT positioning, use cases, contact)
+├── methode.html                      CMMI Level 3 methodology
+├── projet-edgestream-gw.html         EdgeStream-GW — IoT gateway & edge analytics
+├── projet-smart-maintenance.html     Smart Maintenance — industrial AI (showcase)
+├── projet-fog-crypto-core.html       Fog-Crypto Core — FPGA accelerator
+├── projet-netsentry-iot.html         NetSentry-IoT — cybersecurity probe
+├── documentation.html                Technical reports & source documents
+├── blog/                             Insights — technical notes, LinkedIn-style
+│   ├── index.html                    Article index
+│   └── <slug>.html                   Individual articles
 ├── assets/
-│   ├── css/style.css              Single stylesheet ("Swiss minimal" design, auto dark mode)
-│   └── js/main.js                 Lightweight JS: mobile nav, theme, year (progressive enhancement)
-├── favicon.svg                    Favicon
-├── robots.txt                     Robots + sitemap pointer
-├── sitemap.xml                    Sitemap (helveticore.com domain)
-└── _headers                       Security / cache headers (Cloudflare Pages)
+│   ├── css/style.css                 Single stylesheet ("Swiss minimal" design, auto dark mode)
+│   └── js/main.js                    Lightweight JS: mobile nav, theme, year (progressive enhancement)
+├── docs/
+│   └── edgestream-gw/                Published EdgeStream-GW documents (11/2026 snapshots)
+├── favicon.svg                       Favicon
+├── robots.txt                        Robots + sitemap pointer
+├── sitemap.xml                       Sitemap (helveticore.com domain)
+└── _headers                          Security / cache headers (Cloudflare Pages)
 ```
 
 ## Local preview
@@ -66,12 +74,13 @@ Add the `helveticore.com` domain (or a `*.pages.dev` subdomain) in
 
 ## Keeping the site up to date
 
-The site describes the state of the portfolio. When the `EdgeStream-GW` repository evolves,
-update in priority:
+The site describes the state of the portfolio. When a source repository evolves, update in
+priority:
 
 - the status badges (`Phase: …`) on each project page;
-- the "Current repository state" section of `index.html`;
-- the KPIs, milestones and decisions when new CMMI artifacts are written.
+- the KPIs, milestones and decisions when new CMMI artifacts are written;
+- the published documents in `docs/edgestream-gw/` (snapshots are dated);
+- the blog articles when a build reaches a new, verifiable milestone.
 
 Any content change must stay faithful to the source repository — that is the site's
 transparency rule.

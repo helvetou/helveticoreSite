@@ -1,3 +1,5 @@
+> Snapshot of projects/edgestream-gw/SBOM.md — 11 Nov 2026
+
 # Software Bill of Materials — EdgeStream-GW (Milestone 1)
 
 _Date: 2026-10-28 · Scope: all Python source & test files under `projects/edgestream-gw/` · State: Milestone 1 (KPI −75 % proven)_

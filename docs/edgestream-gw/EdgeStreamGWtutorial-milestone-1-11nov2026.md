@@ -1,3 +1,5 @@
+> Snapshot of projects/edgestream-gw/tutorial-milestone-1.md — 11 Nov 2026
+
 # Tutorial: Build EdgeStream-GW up to Milestone 1 — the beginner's edition
 
 *Written for someone who is new to industrial protocols, new to CMMI, and still
