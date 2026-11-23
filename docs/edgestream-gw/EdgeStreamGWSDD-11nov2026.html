@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EdgeStream-GW — SDD IEEE 1016 (summary) · Helveticore Docs</title>
+  <meta name="description" content="EdgeStream-GW technical document — EdgeStream-GW — SDD IEEE 1016 (summary), rendered from the source markdown.">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../../index.html" aria-label="Helveticore — home">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="../../blog/index.html">Blog</a></li>
+        <li><a href="../../methode.html">Method</a></li>
+        <li><a href="../../documentation.html" aria-current="page">Docs</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="doc">
+        <a class="article-back" href="../../documentation.html">← Back to documentation</a>
+<blockquote>Snapshot of projects/edgestream-gw/design/SDD.md — 11 Nov 2026</blockquote>
+<h1>EdgeStream-GW — SDD IEEE 1016 (summary)</h1>
+<p>Full document: <code>docs/EdgeStream-GW SYSTEM AND SOFTWARE DESIGN DESCRIPTION.pdf</code>. This page is the maintained Markdown summary, the source of truth as development proceeds.</p>
+<h2>1. Overview</h2>
+<p>Industrial IoT gateway between sensors/meters/PLCs and the Cloud, processing real-time streams locally. Methodological framework CMMI L3: V-Model (macro) + TDD (micro) + CBSE (integration). KPI: −75% volume, &lt; 50 ms actuation.</p>
+<h2>2. Key definitions</h2>
+<ul>
+<li><strong>Frame</strong> — standardized internal JSON object representing parsed telemetry.</li>
+<li><strong>ActionCommand</strong> — strict structure of an immediate hardware write command (e.g. Modbus FC 05).</li>
+<li><strong>Fail-Fast</strong> — immediate, explicit failure on corrupted data, without silent "repair".</li>
+<li><strong>CorruptedPayloadError</strong> — proprietary exception raised by the protocol adapters.</li>
+<li><strong>Edge Analytics</strong> — logical PS/PL construct performing data reduction.</li>
+<li><strong>Northbound Publishers</strong> — modules publishing telemetry to Cloud/SCADA.</li>
+<li><strong>AXI Bus</strong> — internal high-bandwidth bus between PS (software) and PL (FPGA).</li>
+<li><strong>Sparkplug B</strong> — industrial MQTT spec (namespace, states, Protobuf payload).</li>
+</ul>
+<h2>3. Architectural viewpoints</h2>
+<ul>
+<li><strong>3.1 Containerization</strong>: Docker, isolated microservices, secure OTA.</li>
+<li><strong>3.2 Network boundaries</strong>: synchronous south (Modbus, DLMS/COSEM); asynchronous north
+(MQTT + Sparkplug B, OPC UA client-server and PubSub).</li>
+<li><strong>3.3 CBSE</strong>: Build vs Reuse qualification of components.</li>
+<li><strong>3.4 PS/PL partitioning</strong>: PS = async (Docker, asyncio, MQTT/OPC UA); PL = deterministic
+(filtering, FFT, low-latency triggers); AXI + interrupt interfaces.</li>
+</ul>
+<h2>4. Modular pipeline</h2>
+<p>South Drivers → Protocol Adapters → Edge Analytics (PL filtering / PS aggregation) → Ingestion Core → Northbound Publishers.</p>
+<h2>5. Resilience</h2>
+<ul>
+<li><strong>5.1 Local loop</strong>: PL detects threshold breach → interrupt → PS dispatches the
+<code>ActionCommand</code> &lt; 50 ms.</li>
+<li><strong>5.2 Store-and-Forward</strong>: offline SQLite buffer, replay on reconnection.</li>
+</ul>
+<h2>6. Decisions</h2>
+<p>See <a href="EdgeStreamGWdecision-log-11nov2026.html"><code>decision-log.md</code></a>.</p>
+<h2>7. Traceability</h2>
+<p>See <a href="EdgeStreamGWRTM-11nov2026.html"><code>../requirements/RTM.md</code></a>.</p>
+        <p class="faint doc-source">Source: <a href="EdgeStreamGWSDD-11nov2026.md">raw markdown</a> — published as-is from the source repository.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+          <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="../../blog/index.html">Blog</a></li>
+          <li><a href="../../methode.html">Method</a></li>
+          <li><a href="../../documentation.html">Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span><span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

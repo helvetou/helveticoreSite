@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EdgeStream-GW — Project Status · Helveticore Docs</title>
+  <meta name="description" content="EdgeStream-GW technical document — EdgeStream-GW — Project Status, rendered from the source markdown.">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../../index.html" aria-label="Helveticore — home">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="../../blog/index.html">Blog</a></li>
+        <li><a href="../../methode.html">Method</a></li>
+        <li><a href="../../documentation.html" aria-current="page">Docs</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="doc">
+        <a class="article-back" href="../../documentation.html">← Back to documentation</a>
+<h1>EdgeStream-GW — Project Status</h1>
+<p><strong>11 November 2026</strong> · Helveticore OÜ (Tallinn, Estonia)</p>
+<div class="table-wrap"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Project</strong></td><td>EdgeStream-GW — IoT Gateway &amp; Edge Analytics</td></tr><tr><td><strong>Portfolio position</strong></td><td>Strategic triptych #1 (Smart Grid)</td></tr><tr><td><strong>Maturity</strong></td><td>CMMI-DEV Level 3 "Defined"</td></tr><tr><td><strong>Current milestone</strong></td><td>Milestone 1 sealed — volume-reduction KPI proven</td></tr><tr><td><strong>Overall status</strong></td><td>✅ Baseline &amp; KPI proven · ⬜ production pipeline next</td></tr><tr><td><strong>Hardware target</strong></td><td>Puzhi ZU2CG / ZU3EG (Zynq UltraScale+)</td></tr></tbody></table></div>
+<hr>
+<h2>Status at a glance</h2>
+<div class="table-wrap"><table><thead><tr><th>Area</th><th>State</th></tr></thead><tbody><tr><td>Protocol adapters (Modbus RTU + TCP)</td><td>✅ Done — 38 tests, 99 % coverage</td></tr><tr><td>Edge Analytics PS (aggregation / dedup)</td><td>✅ Done — 19 tests, 100 % coverage</td></tr><tr><td>Virtual 50-meter test bench</td><td>✅ Done — 9 tests, deterministic</td></tr><tr><td>−75 % volume-reduction KPI</td><td>✅ Proven — measured <strong>96.07 %</strong></td></tr><tr><td>Ingestion Core (async broker)</td><td>⬜ Milestone 2</td></tr><tr><td>Northbound MQTT / Sparkplug B</td><td>⬜ Milestone 3</td></tr><tr><td>Store-and-Forward (SQLite)</td><td>⬜ Milestone 4</td></tr><tr><td>Local Action Engine (&lt; 50 ms)</td><td>⬜ Milestone 5</td></tr><tr><td>Deployment (Docker / OTA)</td><td>⬜ Milestone 6</td></tr><tr><td>DLMS/COSEM adapter</td><td>⬜ Milestone 7</td></tr><tr><td>Edge Analytics PL (FPGA) + PS/PL</td><td>⬜ Milestone 8</td></tr></tbody></table></div>
+<p><strong>Bottom line:</strong> the gateway's core value — turning a high-frequency meter stream into a small, clean, normalized stream — is implemented, tested, and <em>measured</em>. What remains is the production pipeline around it (routing, publication, offline resilience, deployment).</p>
+<hr>
+<h2>What EdgeStream-GW is</h2>
+<p>An ultra-lightweight industrial software gateway that sits between physical perception nodes (meters, sensors, PLCs) and the Cloud. It reads raw time-series data, normalizes it into one strict shared <code>Frame</code> object, and shrinks it locally before publication — so the Cloud receives far less data while the important information is preserved.</p>
+<p>Two hard KPIs drive the design:</p>
+<ul>
+<li><strong>−75 %</strong> data volume transmitted to the Cloud (target; measured <strong>96.07 %</strong>).</li>
+<li>Local actuation latency <strong>&lt; 50 ms</strong> (fast path, no Cloud round-trip — Milestone 5).</li>
+</ul>
+<hr>
+<h2>Done (verified)</h2>
+<ul>
+<li><strong>Milestone 0 — Baseline</strong> (<code>milestone-0-baseline</code>)
+<ul>
+<li>Fail-Fast protocol adapters: <code>ModbusRtuAdapter</code> + <code>ModbusTcpAdapter</code> behind one
+<code>ProtocolAdapter</code> interface.</li>
+<li>Strict Pydantic v2 <code>Frame</code> schema (<code>extra="forbid"</code>, bounded fields, non-empty measurements).</li>
+<li>Edge Analytics PS: <code>compute_stats</code>, <code>aggregate_window</code>, <code>dedupe</code>, <code>WindowAggregator</code>.</li>
+<li>Deterministic 50-energy-meter virtual test bench.</li>
+<li>Technical report generator (<code>makeTRM</code> → <code>.docx</code>).</li>
+</ul></li>
+</ul>
+<ul>
+<li><strong>Milestone 1 — Volume-reduction KPI</strong> (<code>milestone-1-volume-kpi</code>)
+<ul>
+<li>End-to-end measurement: <code>simulator → adapter → Frame → WindowAggregator</code>.</li>
+<li>Measured <strong>96.07 %</strong> northbound byte reduction (target ≥ 75 %), stable across 5 seeds.</li>
+</ul></li>
+</ul>
+<hr>
+<h2>Verification evidence</h2>
+<div class="table-wrap"><table><thead><tr><th>Suite</th><th>Tests</th><th>Coverage</th></tr></thead><tbody><tr><td>protocol-adapters</td><td>38 passed</td><td>99 % (2 defensive lines missed)</td></tr><tr><td>edge-analytics/ps</td><td>19 passed</td><td>100 %</td></tr><tr><td>testbench</td><td>9 passed</td><td>— (integration)</td></tr><tr><td><strong>Total</strong></td><td><strong>66 passed</strong></td><td></td></tr></tbody></table></div>
+<p>KPI measurement (Milestone 1), 50 meters × 300 s @ 1 Hz, 60 s RMS window:</p>
+<div class="table-wrap"><table><thead><tr><th>Metric</th><th>Raw</th><th>Aggregated</th><th>Reduction</th></tr></thead><tbody><tr><td>Frames</td><td>15 000</td><td>250</td><td><strong>98.33 %</strong></td></tr><tr><td>Measurements</td><td>60 000</td><td>3 000</td><td><strong>95.00 %</strong></td></tr><tr><td>JSON bytes (mean)</td><td>6 666 214</td><td>262 004</td><td><strong>96.07 %</strong></td></tr></tbody></table></div>
+<hr>
+<h2>Reproduce it yourself</h2>
+<pre><code class="language-bash"># run all tests (expect 66 passed)
+cd projects/edgestream-gw/src/protocol-adapters &amp;&amp; .venv/bin/pytest -q     # 38
+cd projects/edgestream-gw/src/edge-analytics/ps &amp;&amp; \
+  ../../protocol-adapters/.venv/bin/python -m pytest -q                     # 19
+cd projects/edgestream-gw/testbench &amp;&amp; \
+  ../src/protocol-adapters/.venv/bin/python -m pytest -q                    # 9
+
+# re-measure the KPI
+cd projects/edgestream-gw/performance &amp;&amp; \
+  ../src/protocol-adapters/.venv/bin/python measure_volume_reduction.py
+#   → byte_reduction_pct ≈ 96.07 %, pass: true</code></pre>
+<hr>
+<h2>Roadmap</h2>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Milestone</th><th>Status</th><th>Tag</th><th>Exit criteria</th></tr></thead><tbody><tr><td>0</td><td>Baseline</td><td>✅ Done</td><td><code>milestone-0-baseline</code></td><td>66 tests pass; report regenerable</td></tr><tr><td>1</td><td>Volume-reduction KPI</td><td>✅ Done</td><td><code>milestone-1-volume-kpi</code></td><td>≥ 75 % reduction measured &amp; archived</td></tr><tr><td>2</td><td>Ingestion Core</td><td>⬜ Next</td><td><code>milestone-2-ingestion-core</code></td><td>Async broker; lossless delivery + back-pressure tests</td></tr><tr><td>3</td><td>Northbound MQTT + Sparkplug B</td><td>⬜ Pending</td><td><code>milestone-3-northbound-mqtt</code></td><td><code>Frame</code> adapter vs local Mosquitto</td></tr><tr><td>4</td><td>Store-and-Forward SQLite</td><td>⬜ Pending</td><td><code>milestone-4-store-forward</code></td><td>Simulated outage + ordered replay (REQ-002)</td></tr><tr><td>5</td><td>Local Action Engine &lt; 50 ms</td><td>⬜ Pending</td><td><code>milestone-5-action-engine</code></td><td>p95/max latency &lt; 50 ms (REQ-003)</td></tr><tr><td>6</td><td>Deployment Docker/Compose/OTA</td><td>⬜ Pending</td><td><code>milestone-6-deployment</code></td><td><code>docker compose up</code> zero-config (REQ-005/006)</td></tr><tr><td>7</td><td>DLMS/COSEM adapter</td><td>⬜ Pending</td><td><code>milestone-7-dlms</code></td><td>Dedicated spec phase (Decision 9)</td></tr><tr><td>8</td><td>Edge Analytics PL + PS/PL</td><td>⬜ Pending</td><td><code>milestone-8-pl-integration</code></td><td>RTL/HLS filtering on Puzhi board</td></tr><tr><td>9</td><td>Fog-Crypto Core spec</td><td>⬜ Pending</td><td><code>milestone-9-fog-crypto-spec</code></td><td>Requirements/design/testbench plan</td></tr><tr><td>10</td><td>NetSentry-IoT spec</td><td>⬜ Pending</td><td><code>milestone-10-netsentry-spec</code></td><td>Requirements/design/testbench plan</td></tr></tbody></table></div>
+<hr>
+<h2>Honest framing: what is <em>not</em> there yet</h2>
+<p>At Milestone 1 this is a <strong>proven building block, not a deployable product</strong>. It reads <em>simulated</em> meters and shrinks data. Missing before production: south drivers (real polling), ingestion-core routing, northbound publication (MQTT/OPC UA), store-and-forward, the local action loop, and deployment. Without store-and-forward and northbound, the gateway has no way to send data or survive a network outage.</p>
+<p>Known hardening items before production (full list in the technical report):</p>
+<ul>
+<li>Observability and a boundary policy (log + quarantine malformed frames).</li>
+<li>Clock validation, bounded buffers, data-quality flags (<code>stale</code>/<code>suspect</code>).</li>
+<li>Concurrency (per-device <code>asyncio</code>), external configuration, TLS + authn.</li>
+<li>Failure-injection and soak tests; real-hardware calibration.</li>
+</ul>
+<hr>
+<h2>Key artifacts</h2>
+<ul>
+<li>Requirements: <a href="EdgeStreamGWREQ-11nov2026.html"><code>REQ-11nov2026.md</code></a> · <a href="EdgeStreamGWRTM-11nov2026.html"><code>RTM-11nov2026.md</code></a></li>
+<li>Design: <a href="EdgeStreamGWSDD-11nov2026.html"><code>SDD-11nov2026.md</code></a> · <a href="EdgeStreamGWdecision-log-11nov2026.html"><code>decision-log-11nov2026.md</code></a></li>
+<li>KPI report: <a href="EdgeStreamGWvolume_reduction_report-11nov2026.html"><code>volume_reduction_report-11nov2026.md</code></a></li>
+<li>Bill of materials: <a href="EdgeStreamGWSBOM-11nov2026.html"><code>SBOM-11nov2026.md</code></a></li>
+<li>Beginner tutorial: <a href="EdgeStreamGWtutorial-milestone-1-11nov2026.html"><code>tutorial-milestone-1-11nov2026.md</code></a></li>
+<li>Companion document: <a href="EdgeStream-rapport-technique-11nov2026.html"><code>EdgeStream-rapport-technique-11nov2026.md</code></a></li>
+</ul>
+<p><em>Status snapshot prepared for online publication — 11 November 2026.</em></p>
+        <p class="faint doc-source">Source: <a href="EdgeStreamGW-status-11nov2026.md">raw markdown</a> — published as-is from the source repository.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+          <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="../../blog/index.html">Blog</a></li>
+          <li><a href="../../methode.html">Method</a></li>
+          <li><a href="../../documentation.html">Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span><span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

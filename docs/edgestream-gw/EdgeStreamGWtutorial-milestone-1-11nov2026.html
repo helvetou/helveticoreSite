@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutorial: Build EdgeStream-GW up to Milestone 1 — the beginner's edition · Helveticore Docs</title>
+  <meta name="description" content="EdgeStream-GW technical document — Tutorial: Build EdgeStream-GW up to Milestone 1 — the beginner's edition, rendered from the source markdown.">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../../index.html" aria-label="Helveticore — home">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="../../blog/index.html">Blog</a></li>
+        <li><a href="../../methode.html">Method</a></li>
+        <li><a href="../../documentation.html" aria-current="page">Docs</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="doc">
+        <a class="article-back" href="../../documentation.html">← Back to documentation</a>
+<blockquote>Snapshot of projects/edgestream-gw/tutorial-milestone-1.md — 11 Nov 2026</blockquote>
+<h1>Tutorial: Build EdgeStream-GW up to Milestone 1 — the beginner's edition</h1>
+<p><em>Written for someone who is new to industrial protocols, new to CMMI, and still getting comfortable with code. We explain every idea in plain words first, then show just enough code. You do not need to be a Modbus or CMMI expert to follow this — by the end, you will understand what was built and why.</em></p>
+<blockquote><strong>Part 1 of a series.</strong> This tutorial covers <strong>Milestone 0</strong> (the baseline: protocol adapters, Edge Analytics PS, the 50-meter test bench) and <strong>Milestone 1</strong> (the proof of the −75 % data-reduction KPI). Each later milestone gets its own tutorial in the same series. The full roadmap is in §16.</blockquote>
+<hr>
+<h2>1. Welcome — what we're building</h2>
+<p>EdgeStream-GW is a small piece of software that sits <strong>between</strong> physical devices (electricity meters) and the Cloud. Its two jobs:</p>
+<ol>
+<li><strong>Read</strong> measurements from many meters.</li>
+<li><strong>Shrink</strong> that data before sending it to the Cloud, so we send far less
+(the target: at least <strong>75 % less</strong>), while keeping the important information.</li>
+</ol>
+<p>By "Milestone 1" we have built and <em>proven</em> the shrinking part. Everything else (sending to the Cloud, offline storage, the fast reaction loop) comes later.</p>
+<p>This gateway is one of three portfolio projects that share the same way of working:</p>
+<pre><code class="language-mermaid">flowchart TB
+    A[EdgeStream-GW&lt;br/&gt;Gateway &amp; Analytics]
+    B[Fog-Crypto Core&lt;br/&gt;FPGA accelerator]
+    C[NetSentry-IoT&lt;br/&gt;Cybersecurity probe]</code></pre>
+<p>If the jargon is new to you, keep a finger on section 3 (the glossary) and come back to it whenever a word feels slippery.</p>
+<hr>
+<h2>2. The tools you'll need</h2>
+<div class="table-wrap"><table><thead><tr><th>Tool</th><th>What it does (in plain words)</th></tr></thead><tbody><tr><td><strong>Python</strong></td><td>The programming language. Easy to read, good for this kind of work.</td></tr><tr><td><strong>venv</strong></td><td>A private "box" of installed tools for <em>this project only</em>, so we don't mess up your system.</td></tr><tr><td><strong>pytest</strong></td><td>Runs our tests and tells us which ones pass or fail.</td></tr><tr><td><strong>pydantic</strong></td><td>A library that checks the <em>shape</em> of our data (more in section 7).</td></tr><tr><td><strong>hypothesis</strong></td><td>A library that throws <em>random</em> inputs at our code to find hidden bugs.</td></tr><tr><td><strong>pytest-cov</strong></td><td>Counts how many lines of code our tests actually exercise.</td></tr><tr><td><strong>git</strong></td><td>Remembers every version of our work, so we can move back in time safely.</td></tr></tbody></table></div>
+<p>You don't need to install anything special to <em>read</em> this tutorial. When you want to <em>run</em> things, the commands are at the bottom (section 15).</p>
+<hr>
+<h2>3. Plain-language glossary</h2>
+<p>These are the words you'll meet over and over:</p>
+<ul>
+<li><strong>Program</strong> — a file (or files) of instructions the computer follows.</li>
+<li><strong>Function</strong> — a small, named block of instructions that does <em>one</em> job. You call it by name.</li>
+<li><strong>Class</strong> — a blueprint for making objects that bundle data + behaviour together.</li>
+<li><strong>Object</strong> — one concrete thing built from a class (e.g. one <code>Frame</code>, one <code>Meter</code>).</li>
+<li><strong>Type</strong> — the <em>kind</em> of a value: is it a whole number (<code>int</code>), a decimal (<code>float</code>), text (<code>str</code>), or True/False (<code>bool</code>)?</li>
+<li><strong>Exception</strong> — the computer's way of saying "something went wrong; stop and tell me." Our code uses exceptions on purpose (section 8).</li>
+<li><strong>Library</strong> — code written by someone else that we reuse instead of reinventing.</li>
+<li><strong>Test</strong> — a small program that checks our real code behaves correctly.</li>
+<li><strong>Test-first (TDD)</strong> — write the test <em>before</em> the code; watch it fail; then write code until it passes.</li>
+<li><strong>Schema / contract</strong> — an agreed <em>shape</em> for data: which fields must exist, what type each one is, what values are allowed.</li>
+<li><strong>Fail-Fast</strong> — the rule "if data is bad, refuse it loudly now, never quietly fix it."</li>
+<li><strong>Deterministic</strong> — the same input always gives the same output. (Very useful for tests and measurements.)</li>
+<li><strong>Byte</strong> — the smallest unit of data on a wire or disk. Raw messages are just a bunch of bytes.</li>
+<li><strong>Protocol</strong> — an agreed "language" two machines use to talk to each other.</li>
+<li><strong>Register</strong> — one numbered box inside a Modbus device holding one number (section 4).</li>
+<li><strong>Frame</strong> — our one clean "envelope" that all data gets put into (section 7).</li>
+<li><strong>Aggregate</strong> — to combine many values into one summary value.</li>
+<li><strong>Reducer</strong> — the <em>rule</em> used to combine values (e.g. "keep the average" or "keep the biggest").</li>
+<li><strong>KPI</strong> — Key Performance Indicator: a number that proves we hit our goal (here: −75 %).</li>
+<li><strong>Milestone</strong> — a checkpoint: a chunk of work, done and verified, that we can point to.</li>
+<li><strong>Commit / tag</strong> — git's way of saving a snapshot, and giving a snapshot a name.</li>
+</ul>
+<hr>
+<h2>4. What is Modbus? (in plain words)</h2>
+<p>Modbus is a very old, very simple way for a computer to ask an industrial device — like an electricity meter — <em>"what are your readings?"</em> and get an answer back.</p>
+<p>Think of a meter as a <strong>wall of little numbered boxes</strong>. Each box is called a <strong>register</strong>, and each one holds one number:</p>
+<pre><code>box 1  = voltage_l1        (e.g. 230.5 V)
+box 2  = current_l1        (e.g. 12.34 A)
+box 3  = active_power      (e.g. 2845 W)
+box 4  = active_energy     (e.g. 312.6 kWh)</code></pre>
+<p>To read the boxes, the computer sends a short message that means: <strong>"Device number 1, please read boxes 1 through 4 for me."</strong> That "read the boxes" request is called <strong>function code 03</strong>. The device replies with the numbers inside those boxes.</p>
+<p>That's 80 % of Modbus for our purposes. The other 20 % is <em>how the message travels</em>:</p>
+<ul>
+<li><strong>Modbus RTU</strong> — travels over a <strong>cable</strong> (serial). Because cables can be noisy,
+the message ends with a small check number called a <strong>CRC</strong>. The receiver
+recomputes it; if it doesn't match, the message got scrambled and must be thrown away.</li>
+<li><strong>Modbus TCP</strong> — travels over a <strong>network</strong> (like ethernet). The same question
+and answer, but wrapped in an extra envelope called an <strong>MBAP header</strong> (which
+carries a transaction number and a length).</li>
+</ul>
+<blockquote><strong>Our job is not to become a Modbus expert.</strong> Our job is to take the raw bytes that come off the wire and turn them into one clean, <em>checked</em> object — the Frame.</blockquote>
+<hr>
+<h2>5. What is CMMI? (in plain words)</h2>
+<p>Don't let the acronym scare you. CMMI is just a company saying:</p>
+<blockquote><em>"We agree to work in a documented, repeatable way, so our results don't depend on who happens to be typing that day."</em></blockquote>
+<p>For this project it boils down to <strong>three habits</strong>:</p>
+<ol>
+<li><strong>Think first.</strong> Write down what you want (the <em>requirements</em>) and how you'll
+build it (the <em>design</em>) <em>before</em> you code.</li>
+<li><strong>Test first (TDD).</strong> For every piece, write the test, watch it fail, then
+write the smallest code that makes it pass, then tidy up.</li>
+<li><strong>Reuse sensibly.</strong> Use existing tools when they're good enough (like a Modbus
+library). Build it yourself <em>only</em> when you need strict control — like our
+fail-loud parser, which must refuse bad data instead of quietly "fixing" it.</li>
+</ol>
+<p>That's it. You do <strong>not</strong> need to memorize a CMMI rulebook. Just remember: <strong>think first, test first, reuse sensibly.</strong> The whole repo is organized around those three habits, which is why it has folders called <code>requirements/</code>, <code>design/</code>, <code>testbench/</code>, and <code>src/</code>.</p>
+<hr>
+<h2>6. The big picture: the data pipeline</h2>
+<p>Data flows through the gateway like water through a pipe, from <strong>south</strong> (the meters) to <strong>north</strong> (the Cloud):</p>
+<pre><code>south-drivers  →  protocol-adapters  →  edge-analytics  →  ingestion-core  →  northbound-publishers
+  (read meters)     (make a Frame)       (shrink data)      (route data)        (send to Cloud)</code></pre>
+<pre><code class="language-mermaid">flowchart LR
+    A[south-drivers&lt;br/&gt;read meters] --&gt; B[protocol-adapters&lt;br/&gt;make a Frame]
+    B --&gt; C[edge-analytics&lt;br/&gt;shrink data]
+    C --&gt; D[ingestion-core&lt;br/&gt;route]
+    D --&gt; E[northbound-publishers&lt;br/&gt;send to Cloud]
+    C -.-&gt; F[local-action-engine&lt;br/&gt;fast path]
+    C -.-&gt; G[store-and-forward&lt;br/&gt;offline queue]</code></pre>
+<p>Up to Milestone 1, we build only two blocks plus their helpers:</p>
+<ul>
+<li><strong>protocol-adapters</strong> — turn raw bytes into a clean <code>Frame</code>.</li>
+<li><strong>edge-analytics</strong> — shrink many <code>Frame</code>s into fewer ones (the −75 %).</li>
+<li><strong>the test bench</strong> — a fake fleet of 50 meters, so we can test without real hardware.</li>
+</ul>
+<p>The blocks we <em>don't</em> build yet (south-drivers, ingestion-core, northbound-publishers) come in later milestones. Knowing they exist is enough for now.</p>
+<hr>
+<h2>7. The Frame: one shared envelope</h2>
+<p>The single most important idea in the whole project:</p>
+<blockquote><strong>Everyone agrees on one shape for data, called <code>Frame</code>. Once data is inside a Frame, nobody cares whether it came from Modbus RTU, Modbus TCP, or DLMS.</strong></blockquote>
+<p>A Frame carries:</p>
+<ul>
+<li><strong>who</strong> the data came from (<code>source</code>: device id, protocol, unit id),</li>
+<li><strong>when</strong> it was collected (<code>collected_at</code>),</li>
+<li><strong>what</strong> was measured (<code>measurements</code>: a list of name + value + unit + quality).</li>
+</ul>
+<p>In Python, we <em>describe</em> that shape with <code>pydantic</code>, and we are <strong>strict</strong> about it:</p>
+<pre><code class="language-python">class Source(BaseModel):
+    model_config = ConfigDict(extra=&quot;forbid&quot;)   # reject anything unexpected
+    device_id: str
+    protocol: Literal[&quot;modbus_rtu&quot;, &quot;modbus_tcp&quot;, &quot;dlms_cosem&quot;]
+    unit_id: int = Field(ge=0, le=247)          # must be between 0 and 247
+
+class Frame(BaseModel):
+    model_config = ConfigDict(extra=&quot;forbid&quot;)
+    frame_id: UUID
+    source: Source
+    collected_at: str
+    measurements: list[Measurement] = Field(min_length=1)  # never empty</code></pre>
+<pre><code class="language-mermaid">flowchart TB
+    F[Frame] --&gt; S[source: Source]
+    F --&gt; C[collected_at: str]
+    F --&gt; M[measurements: list]
+    S --&gt; SD[device_id: str]
+    S --&gt; SP[protocol: Literal]
+    S --&gt; SU[unit_id: 0..247]
+    M --&gt; MM[Measurement]
+    MM --&gt; MN[name: str]
+    MM --&gt; MV[value: float]
+    MM --&gt; MU[unit: str]
+    MM --&gt; MQ[quality: ok/stale/suspect]</code></pre>
+<p><strong>Why be strict? (quality habit)</strong> If someone accidentally sends an extra field, or forgets a field, or uses a value out of range, we want a <strong>loud error</strong>, not a silent "we'll ignore it." A silent ignore means a typo can produce data that <em>looks</em> fine but is actually wrong.</p>
+<blockquote>Beginner translation: <code>model_config = ConfigDict(extra="forbid")</code> means "if you hand me a field I don't know about, I refuse." <code>Field(ge=0, le=247)</code> means "this number must be between 0 and 247."</blockquote>
+<hr>
+<h2>8. Part 1 — Protocol adapters: bytes → Frame</h2>
+<h3>8.1 The "fail loudly" rule (Fail-Fast)</h3>
+<p>When we read raw bytes from a wire, sometimes they're <strong>corrupted</strong> — cut off, scrambled by noise, or not what we expected. Our rule:</p>
+<blockquote><strong>Never silently fix bad data. Refuse it, loudly, immediately.</strong></blockquote>
+<p>We refuse by <em>throwing</em> a special error called <code>CorruptedPayloadError</code>. It carries a <strong>reason code</strong> — a short label that says <em>why</em> the data was bad:</p>
+<pre><code>TRUNCATED         the message was cut short
+BAD_CRC           the check number doesn&#x27;t match (RTU)
+WRONG_FC          it&#x27;s not a &quot;read the boxes&quot; (03) message
+INCOMPLETE_ARRAY  the number of boxes doesn&#x27;t match what we expect
+OUT_OF_RANGE      a value is outside its allowed limits
+BAD_UNIT_ID       the device number is wrong or out of range
+WRONG_PROTOCOL    we were told RTU but got TCP, etc.</code></pre>
+<p>Downstream code can check <code>exc.reason_code</code> and react — no messy string-matching.</p>
+<h3>8.2 The input and the interface</h3>
+<p>Before parsing, the raw message arrives as a <code>RawPayload</code> — a simple, <strong>frozen</strong> (unchanging) bundle:</p>
+<pre><code class="language-python">@dataclass(frozen=True)
+class RawPayload:
+    protocol: str        # &quot;modbus_rtu&quot; | &quot;modbus_tcp&quot; | &quot;dlms_cosem&quot;
+    device_id: str
+    unit_id: int
+    collected_at: str    # the timestamp, filled in by the driver (not us)
+    data: bytes          # the raw message, exactly as received</code></pre>
+<p>Then every adapter implements the <strong>same</strong> promise:</p>
+<pre><code class="language-python">class ProtocolAdapter(ABC):
+    def parse(self, payload: RawPayload) -&gt; Frame:
+        &quot;&quot;&quot;Return a valid Frame, or raise CorruptedPayloadError. Nothing else.&quot;&quot;&quot;</code></pre>
+<p><strong>Why this matters:</strong></p>
+<ul>
+<li>Because <code>parse</code> always returns <code>Frame</code> (or fails), every later block can trust
+that "a Frame is always a <em>valid</em> Frame."</li>
+<li>Because the timestamp is <em>handed to us</em> (<code>collected_at</code>) and never read from the
+clock inside the adapter, the adapter is <strong>pure</strong>: same input → same output.
+That makes it easy to test and easy to replay.</li>
+<li>Because it's an interface (the ABC), we can later add a DLMS adapter behind the
+<em>same</em> promise without changing anything downstream.</li>
+</ul>
+<h3>8.3 Modbus RTU, in broad strokes</h3>
+<p>The RTU adapter does these checks, in order, and <strong>stops at the first failure</strong>:</p>
+<ol>
+<li>Is the protocol really <code>modbus_rtu</code>? → else <code>WRONG_PROTOCOL</code>.</li>
+<li>Is the device number (<code>unit_id</code>) in range? → else <code>BAD_UNIT_ID</code>.</li>
+<li>Is the message long enough to even be a real message? → else <code>TRUNCATED</code>.</li>
+<li>Does the device number inside the message match what we expected? → else <code>BAD_UNIT_ID</code>.</li>
+<li>Does the length add up? → else <code>TRUNCATED</code>.</li>
+<li>Does the CRC check number match? → else <code>BAD_CRC</code>.</li>
+<li>Is it a "read the boxes" (function code 03) message? → else <code>WRONG_FC</code>.</li>
+<li>Are there the right number of boxes, and is every value in range? → else
+<code>INCOMPLETE_ARRAY</code> / <code>OUT_OF_RANGE</code>.</li>
+</ol>
+<p>Only if <strong>all</strong> of that passes do we build a <code>Frame</code>.</p>
+<p>You don't need to write the CRC math yourself — but here's the idea: the sender runs a small calculation over the message and appends the result. The receiver runs the same calculation and compares. If they differ, the message was damaged. The code does exactly that:</p>
+<pre><code class="language-python">def crc16(data: bytes) -&gt; int:
+    crc = 0xFFFF
+    for byte in data:
+        crc ^= byte
+        for _ in range(8):
+            crc = (crc &gt;&gt; 1) ^ (0xA001 if crc &amp; 1 else 0)
+    return crc</code></pre>
+<blockquote><strong>Reading tip:</strong> don't try to understand every operator in <code>crc16</code>. The point is "it computes a check number." What matters for you is <em>when</em> we call it and <em>why</em> we refuse if it doesn't match.</blockquote>
+<h3>8.4 Modbus TCP: same idea, different envelope</h3>
+<p>TCP does the same checks, but the message is wrapped in an MBAP header. So before the "read the boxes" part, we check:</p>
+<ul>
+<li>the <code>protocol_id</code> is <code>0</code> (it always is, for Modbus) → else <code>WRONG_PROTOCOL</code>,</li>
+<li>the declared <code>length</code> matches reality → else <code>TRUNCATED</code>,</li>
+<li>the total number of bytes is exactly what we expect → else <code>TRUNCATED</code>.</li>
+</ul>
+<p>The <em>decoding</em> of the boxes themselves is shared — it lives in one place (<code>decode_holding_registers</code>) so RTU and TCP don't duplicate it.</p>
+<h3>8.5 Letting a computer throw random junk at your code</h3>
+<p>Hand-written tests can't prove "nothing unexpected ever escapes." So we use <code>hypothesis</code> to generate <strong>hundreds of random byte strings</strong> and feed them to <code>parse</code>. The promise we check is:</p>
+<blockquote>For <em>any</em> random bytes, <code>parse</code> either returns a valid <code>Frame</code> <strong>or</strong> raises <code>CorruptedPayloadError</code> — never any other error, never a crash.</blockquote>
+<pre><code class="language-python">@given(st.binary(max_size=64))
+def test_rtu_arbitrary_bytes_never_crash(data: bytes):
+    try:
+        frame = RTU.parse(RawPayload(..., data=data))
+    except CorruptedPayloadError:
+        return                      # expected: bad input fails fast
+    assert isinstance(frame, Frame) # or we got a valid frame</code></pre>
+<p>If our code ever leaked an <code>IndexError</code> or a crash on weird input, this test would catch it. That's the "exception isolation" rule, enforced by a machine instead of by hoping.</p>
+<hr>
+<h2>9. Part 2 — Edge Analytics: shrinking the data (the −75 %)</h2>
+<h3>9.1 What "aggregation" means</h3>
+<p>Imagine one meter reports every second. Over a minute, that's <strong>60 frames</strong>. Do we need to send all 60 to the Cloud? Usually not — the Cloud mostly needs a <strong>summary</strong> of that minute.</p>
+<p>So we take those 60 frames and squash them into <strong>1 frame</strong> that says, for each measured quantity:</p>
+<ul>
+<li>the <strong>representative value</strong> (by default, the RMS — a kind of average that's
+meaningful for electrical signals),</li>
+<li>the <strong>minimum</strong>,</li>
+<li>the <strong>maximum</strong>.</li>
+</ul>
+<pre><code>60 frames  →  1 frame with  { voltage_l1, voltage_l1.min, voltage_l1.max,
+                              current_l1, current_l1.min, current_l1.max, ... }</code></pre>
+<pre><code class="language-mermaid">flowchart LR
+    T0[t0] --&gt; A
+    T1[t1] --&gt; A
+    T2[t2] --&gt; A
+    TD[...] --&gt; A
+    T59[t59] --&gt; A
+    A[aggregate_window] --&gt; OUT[&quot;1 Frame&lt;br/&gt;name · name.min · name.max&quot;]</code></pre>
+<p>That's the whole −75 % trick: <strong>many frames in, one frame out.</strong></p>
+<h3>9.2 The three small pieces</h3>
+<p>The code is split into three tiny, single-job pieces:</p>
+<ul>
+<li><strong><code>compute_stats(frames)</code></strong> — for each quantity name, compute mean, rms, min,
+max, last, count.</li>
+<li><strong><code>aggregate_window(frames)</code></strong> — take a batch of frames (all from the same
+device, same time window) and produce <strong>one</strong> frame with <code>name</code>, <code>name.min</code>,
+<code>name.max</code> for each quantity. It <em>refuses</em> an empty batch, a bad reducer, or a
+batch mixing two different devices.</li>
+<li><strong><code>WindowAggregator</code></strong> — a helper that keeps a little buffer and, every time a
+time window (say 60 seconds) is crossed, flushes one aggregated frame.</li>
+</ul>
+<p>There's also <strong><code>dedupe</code></strong>, which drops <em>consecutive</em> identical frames (if two readings in a row are exactly the same, the second adds nothing).</p>
+<blockquote><strong>Quality habit — single responsibility:</strong> each function does one clear thing. That's why each one is short, easy to test, and easy to reason about.</blockquote>
+<h3>9.3 Why this is a good design</h3>
+<p>Notice what we did <strong>not</strong> do: we did <em>not</em> change the <code>Frame</code> shape to carry stats. Instead, we express "min" and "max" as <em>additional measurements named</em> <code>voltage_l1.min</code> and <code>voltage_l1.max</code>. That keeps the one shared envelope (section 7) stable — nothing downstream needs to change. This is recorded as "Decision 10" in the design log.</p>
+<hr>
+<h2>10. Part 3 — the fake 50-meter fleet (the test bench)</h2>
+<p>We don't want to buy 50 real meters just to test. So we <strong>simulate</strong> them in code.</p>
+<p>The simulator has two key properties:</p>
+<ol>
+<li><strong>It behaves like real meters</strong> — each meter holds a voltage, a current, etc.,
+and drifts a little each second (voltage wobbles by a small random amount,
+energy slowly accumulates).</li>
+<li><strong>It is deterministic</strong> — every meter is given a <em>seed</em> (a starting number for
+its randomness). The same seed always produces the same readings.</li>
+</ol>
+<pre><code class="language-python">class EnergyMeter:
+    def __init__(self, device_id, unit_id, seed=None):
+        self._rng = random.Random(seed)   # the seed makes it repeatable
+
+class MeterFleet:
+    def __init__(self, count=50, seed=0):
+        self.meters = [EnergyMeter(f&quot;meter-{i:03d}&quot;, i + 1, seed=seed + i)
+                       for i in range(count)]</code></pre>
+<p><strong>Why determinism is a superpower:</strong> if a test fails, it fails the <em>same way every time</em> — you can reproduce it, fix it, and be confident. And when we measure the −75 % KPI, we can re-run the exact same scenario and get the same numbers.</p>
+<p>The test bench also has <strong>frame builders</strong> — helpers that wrap a meter's numbers into a realistic raw Modbus message (RTU or TCP), reusing the same CRC function the adapter uses. Then an end-to-end test proves the whole chain works:</p>
+<pre><code>simulator → (raw bytes) → adapter → (valid Frame) → ...for all 50 meters</code></pre>
+<hr>
+<h2>11. Proving it: measuring the −75 % (Milestone 1)</h2>
+<p>Having the code is not enough — we must <strong>measure</strong> that it actually hits the KPI.</p>
+<p>The measurement (<code>performance/measure_volume_reduction.py</code>) does this:</p>
+<ol>
+<li>Simulate <strong>50 meters × 300 seconds at 1 reading/second</strong> → <strong>15 000 raw frames</strong>.</li>
+<li>Parse each into a <code>Frame</code>.</li>
+<li>Feed each into a per-meter <code>WindowAggregator</code> with a <strong>60-second window</strong>.</li>
+<li>Count the <strong>JSON bytes</strong> of the raw frames vs the aggregated frames.</li>
+</ol>
+<p>The result, run 5 times with different seeds (to be sure it's stable):</p>
+<div class="table-wrap"><table><thead><tr><th>Metric</th><th>Raw</th><th>Aggregated</th><th>Reduction</th></tr></thead><tbody><tr><td>Frames</td><td>15 000</td><td>250</td><td><strong>98.33 %</strong></td></tr><tr><td>Measurements</td><td>60 000</td><td>3 000</td><td><strong>95.00 %</strong></td></tr><tr><td>JSON bytes (mean)</td><td>6 666 214</td><td>262 004</td><td><strong>96.07 %</strong></td></tr></tbody></table></div>
+<p><strong>Reading the numbers:</strong></p>
+<ul>
+<li>The <em>frame count</em> drops by 98 % (60 frames per meter per window → 1).</li>
+<li>The <em>byte</em> reduction is a bit less (96 %) because each aggregated frame carries
+3 numbers per quantity (value + min + max).</li>
+<li>Both comfortably clear the <strong>≥ 75 %</strong> target.</li>
+</ul>
+<blockquote><strong>Quality habit — write the number down.</strong> A KPI is only "proven" when the measurement script, the raw results, and a short report are all saved in the repo (which is what <code>performance/</code> contains). A claim without a reproducible number is just an opinion.</blockquote>
+<hr>
+<h2>12. How to test in Python (a gentle primer)</h2>
+<p>Before we look at each test, four concepts:</p>
+<p><strong>What a test is.</strong> A test is just a function that <em>checks</em> one thing. If the check fails, the test fails. In Python we check with <code>assert</code>:</p>
+<pre><code class="language-python">def test_two_plus_two():
+    assert 2 + 2 == 4      # if this is wrong, the test fails loudly</code></pre>
+<p>pytest finds any function whose name starts with <code>test_</code> inside a file named <code>test_*.py</code>, runs it, and reports pass/fail.</p>
+<p><strong>What a "fixture" is.</strong> A fixture is <em>shared setup</em> — code that prepares something many tests need (an object, a file, a connection). In pytest you write it once with <code>@pytest.fixture</code> and ask for it by name in a test's parameters:</p>
+<pre><code class="language-python">import pytest
+
+@pytest.fixture
+def adapter():
+    return ModbusRtuAdapter(REGISTER_MAP)
+
+def test_uses_fixture(adapter):   # pytest injects the adapter here
+    ...</code></pre>
+<p><strong>Why this repo mostly uses plain helpers instead.</strong> Small tests don't always need the full fixture machinery. Here we use two simpler tools that do the same job:</p>
+<ul>
+<li><strong>Module constants</strong> — e.g. <code>REGISTER_MAP</code> and <code>ADAPTER</code>, built once at the top
+of the file and shared by every test.</li>
+<li><strong>Helper functions</strong> — e.g. <code>_payload(...)</code> or <code>_rtu_frame(...)</code>, which build a
+realistic input in one readable line. (The leading underscore is just a Python
+convention meaning "internal helper, not part of the public API.")</li>
+</ul>
+<p>That keeps the tests short and obvious. One pytest feature we <em>do</em> use is <code>@pytest.mark.parametrize</code>, which runs the <em>same</em> test over several inputs — see <code>test_truncated</code> below.</p>
+<p><strong>The testing rhythm (TDD).</strong> For every new behaviour: (1) write the test and run it — it must <strong>fail</strong> (that proves the test actually checks something); (2) write the smallest code that makes it pass; (3) tidy up. <strong>Red → Green → Refactor.</strong></p>
+<hr>
+<h2>13. Every test in this repo, explained</h2>
+<p>Each test has one goal. Below, for every file, the table says what each test proves. The recurring pattern: <strong>one valid base input, one deliberate break per test</strong> — so a failure points at exactly one behaviour.</p>
+<h3>protocol-adapters — 5 files, 38 tests</h3>
+<p><strong><code>test_frame_schema.py</code> — does the schema reject bad data?</strong></p>
+<p>Helper: <code>_valid_frame(**overrides)</code> builds a valid frame; each test overrides one thing to break it.</p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_valid_frame_accepted</code></td><td>A correct Frame passes validation.</td></tr><tr><td><code>test_missing_required_field_rejected</code></td><td>Removing <code>source</code> must raise <code>ValidationError</code>.</td></tr><tr><td><code>test_wrong_type_rejected</code></td><td><code>measurements="not-a-list"</code> must be rejected (strict type).</td></tr><tr><td><code>test_unknown_field_rejected</code></td><td>An unknown field must be rejected (<code>extra="forbid"</code>).</td></tr><tr><td><code>test_empty_measurements_rejected</code></td><td>An empty list must be rejected (<code>min_length=1</code>).</td></tr><tr><td><code>test_unit_id_out_of_range_rejected</code></td><td><code>unit_id=300</code> must be rejected (bounds 0..247).</td></tr></tbody></table></div>
+<p><strong><code>test_modbus_rtu.py</code> — does the RTU parser fail fast, for every reason?</strong></p>
+<p>Helpers: <code>_rtu_frame(...)</code> (builds a valid RTU message), <code>_payload(...)</code> (builds the input object). Constants: <code>REGISTER_MAP</code>, <code>ADAPTER</code>.</p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_valid_fc03_response_parses</code></td><td>Happy path: valid bytes → Frame with the right values.</td></tr><tr><td><code>test_source_populated</code></td><td>The Frame's <code>source</code> is filled from the payload.</td></tr><tr><td><code>test_truncated</code> (parametrized ×2)</td><td>Too-short data → <code>TRUNCATED</code>.</td></tr><tr><td><code>test_wrong_function_code</code></td><td>FC 0x04 (not "read") → <code>WRONG_FC</code>.</td></tr><tr><td><code>test_bad_crc</code></td><td>Corrupted check number → <code>BAD_CRC</code>.</td></tr><tr><td><code>test_bad_unit_id</code></td><td>Device number mismatch → <code>BAD_UNIT_ID</code>.</td></tr><tr><td><code>test_odd_byte_count</code></td><td>Odd byte count → <code>INCOMPLETE_ARRAY</code>.</td></tr><tr><td><code>test_register_count_mismatch</code></td><td>Wrong register count → <code>INCOMPLETE_ARRAY</code>.</td></tr><tr><td><code>test_out_of_range_value</code></td><td>Value above max → <code>OUT_OF_RANGE</code>.</td></tr><tr><td><code>test_below_min_value</code></td><td>Value below min → <code>OUT_OF_RANGE</code>.</td></tr><tr><td><code>test_non_finite_value</code></td><td>Non-finite value → <code>OUT_OF_RANGE</code>.</td></tr><tr><td><code>test_wrong_protocol</code></td><td>TCP payload into the RTU adapter → <code>WRONG_PROTOCOL</code>.</td></tr><tr><td><code>test_payload_unit_id_out_of_range</code></td><td><code>unit_id=300</code> → <code>BAD_UNIT_ID</code>.</td></tr><tr><td><code>test_empty_register_map_rejected</code></td><td>Empty register map → <code>ValueError</code> at construction.</td></tr></tbody></table></div>
+<p><strong><code>test_modbus_tcp.py</code> — same idea, over the network envelope.</strong></p>
+<p>Helpers: <code>_tcp_frame(...)</code>, <code>_payload(...)</code>. Constants: <code>REGISTER_MAP</code>, <code>ADAPTER</code>.</p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_valid_tcp_response_parses</code></td><td>Happy path: valid TCP bytes → Frame.</td></tr><tr><td><code>test_wrong_protocol</code></td><td>RTU payload into the TCP adapter → <code>WRONG_PROTOCOL</code>.</td></tr><tr><td><code>test_truncated</code></td><td>Too-short data → <code>TRUNCATED</code>.</td></tr><tr><td><code>test_bad_protocol_id</code></td><td>Non-zero protocol id → <code>WRONG_PROTOCOL</code>.</td></tr><tr><td><code>test_bad_unit_id</code></td><td>Device number mismatch → <code>BAD_UNIT_ID</code>.</td></tr><tr><td><code>test_length_mismatch</code></td><td>Declared length wrong → <code>TRUNCATED</code>.</td></tr><tr><td><code>test_wrong_function_code</code></td><td>FC 0x04 → <code>WRONG_FC</code>.</td></tr><tr><td><code>test_odd_byte_count</code></td><td>Odd byte count → <code>INCOMPLETE_ARRAY</code>.</td></tr><tr><td><code>test_register_count_mismatch</code></td><td>Wrong register count → <code>INCOMPLETE_ARRAY</code>.</td></tr><tr><td><code>test_out_of_range</code></td><td>Value above max → <code>OUT_OF_RANGE</code>.</td></tr><tr><td><code>test_payload_unit_id_out_of_range</code></td><td><code>unit_id=300</code> → <code>BAD_UNIT_ID</code>.</td></tr><tr><td><code>test_total_length_mismatch</code></td><td>Truncated bytes despite OK header → <code>TRUNCATED</code>.</td></tr><tr><td><code>test_empty_register_map_rejected</code></td><td>Empty register map → <code>ValueError</code>.</td></tr></tbody></table></div>
+<p><strong><code>test_properties.py</code> — let the computer throw random junk.</strong></p>
+<p>Uses <code>@given</code> (hypothesis) to generate hundreds of inputs per test.</p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_rtu_arbitrary_bytes_never_crash</code></td><td>Any random bytes → <code>CorruptedPayloadError</code> <strong>or</strong> a valid Frame, nothing else.</td></tr><tr><td><code>test_tcp_arbitrary_bytes_never_crash</code></td><td>Same invariant for the TCP adapter.</td></tr><tr><td><code>test_roundtrip_valid_frames</code></td><td>Valid register pairs round-trip to the correct scaled values.</td></tr></tbody></table></div>
+<p><strong><code>test_contract.py</code> — does the adapter plug into its neighbours?</strong></p>
+<p>Uses two fake neighbours: <code>FakeSouthDriver</code> (produces a payload) and <code>FakeIngestionCore</code> (collects Frames).</p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_south_to_north_boundary</code></td><td>driver → adapter → core: one Frame arrives, with the right value.</td></tr></tbody></table></div>
+<h3>edge-analytics/ps — 4 files, 19 tests</h3>
+<p>Every file uses the helper <code>_frame(values)</code> to build a Frame in one line.</p>
+<p><strong><code>test_stats.py</code></strong></p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_empty_window_raises</code></td><td>Empty input must be refused.</td></tr><tr><td><code>test_single_measurement</code></td><td>One value → stats all equal that value.</td></tr><tr><td><code>test_multiple_values</code></td><td>mean/rms/min/max computed correctly over several values.</td></tr><tr><td><code>test_groups_by_name</code></td><td>Different quantity names are grouped separately.</td></tr></tbody></table></div>
+<p><strong><code>test_aggregate.py</code></strong></p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_empty_window_raises</code></td><td>Empty batch must be refused.</td></tr><tr><td><code>test_bad_reducer_raises</code></td><td>Unknown reducer name → <code>ValueError</code>.</td></tr><tr><td><code>test_mixed_sources_raise</code></td><td>Two different devices in one window → <code>ValueError</code>.</td></tr><tr><td><code>test_single_frame_roundtrip</code></td><td>One frame → <code>name</code>, <code>name.min</code>, <code>name.max</code>.</td></tr><tr><td><code>test_volume_reduction</code></td><td>4 frames → 1 frame with 3 measurements (the KPI).</td></tr><tr><td><code>test_rms_min_max</code></td><td>rms/min/max values are correct.</td></tr><tr><td><code>test_reducer_mean</code></td><td><code>reducer="mean"</code> changes the representative value.</td></tr><tr><td><code>test_source_and_timestamp_preserved</code></td><td>Output keeps source + last frame's timestamp.</td></tr></tbody></table></div>
+<p><strong><code>test_dedupe.py</code></strong></p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_drops_consecutive_duplicates</code></td><td><code>[1, 1, 2]</code> → 2 frames.</td></tr><tr><td><code>test_keeps_non_consecutive_duplicates</code></td><td><code>[1, 2, 1]</code> → 3 frames (not merged).</td></tr><tr><td><code>test_empty</code></td><td>Empty list → empty list.</td></tr><tr><td><code>test_all_identical</code></td><td><code>[1, 1, 1]</code> → 1 frame.</td></tr></tbody></table></div>
+<p><strong><code>test_window.py</code></strong></p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_flushes_when_window_crossed</code></td><td>Crossing the window emits one aggregated frame.</td></tr><tr><td><code>test_no_flush_within_window</code></td><td>Within the window, nothing is emitted yet.</td></tr><tr><td><code>test_flush_empty_returns_none</code></td><td>Forcing a flush on empty returns nothing.</td></tr></tbody></table></div>
+<h3>testbench — 2 files, 9 tests</h3>
+<p><strong><code>test_meter_fleet.py</code> — is the fake fleet sane?</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_default_fleet_has_50_meters</code></td><td>Default fleet has 50 meters.</td></tr><tr><td><code>test_unit_ids_are_unique_and_in_range</code></td><td>Unit ids are unique and 1..247.</td></tr><tr><td><code>test_device_ids_are_unique</code></td><td>Device ids are unique.</td></tr><tr><td><code>test_same_seed_gives_same_samples</code></td><td>Same seed → identical readings (determinism).</td></tr><tr><td><code>test_different_seed_gives_different_samples</code></td><td>Different seed → different readings.</td></tr><tr><td><code>test_samples_within_register_bounds</code></td><td>Readings always stay within register min/max.</td></tr></tbody></table></div>
+<p><strong><code>test_southbound_chain.py</code> — does the whole chain work?</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Test</th><th>Goal</th></tr></thead><tbody><tr><td><code>test_rtu_chain_50_meters</code></td><td>Simulator → RTU adapter → valid Frame, all 50 meters.</td></tr><tr><td><code>test_tcp_chain_50_meters</code></td><td>Simulator → TCP adapter → valid Frame, all 50 meters.</td></tr><tr><td><code>test_full_fleet_roundtrip_volume</code></td><td>50 meters × 100 samples = 5 000 frames parsed (load).</td></tr></tbody></table></div>
+<hr>
+<h2>14. Good habits for beginners (the "why" list)</h2>
+<p>These are the habits this project bakes in. If you adopt them, you'll write better code than most people who've been coding for years:</p>
+<ol>
+<li><strong>Fail loudly, never guess.</strong> Bad data → refuse it now. A "helpful" silent
+fix is a hidden bug that corrupts everything downstream.</li>
+<li><strong>Be strict about shape.</strong> Use schemas (<code>extra="forbid"</code>, bounded fields) so
+wrong data can't sneak in as a typo.</li>
+<li><strong>Keep functions small and single-purpose.</strong> If you can't describe what a
+function does in one sentence, split it.</li>
+<li>*<em>Test first, and test the </em>negative<em> cases too.</em>* The happy path is the easy
+half; the real safety lives in the "what happens when input is bad" tests.</li>
+<li><strong>Make things deterministic.</strong> Seed your randomness. A test that sometimes
+passes and sometimes fails is worse than no test — you'll stop trusting it.</li>
+<li><strong>Keep one stable contract in the middle.</strong> The <code>Frame</code> is the fixed point.
+Add to the <em>output</em> rather than breaking the <em>shape</em>.</li>
+<li><strong>Aim for high coverage, but understand the gaps.</strong> This repo runs at 99 % on
+the adapters and 100 % on the analytics. The 2 uncovered lines are <em>defensive</em>
+(a "this should never happen" error in the abstract base class, and a length
+check the adapters already guarantee). Don't chase 100 % blindly — understand
+<em>why</em> a line is uncovered, then decide if it matters.</li>
+<li><strong>Read code in broad strokes first.</strong> Before worrying about operators and
+syntax, ask: "what does this piece do, what does it take in, what does it give
+back?" The details will follow.</li>
+</ol>
+<hr>
+<h2>15. From tutorial to production: what's still missing</h2>
+<p>Honest framing: at Milestone 1 this is a <strong>proven building block, not a deployable product</strong>. It reads <em>simulated</em> meters and shrinks data. Here is the gap — and, for each problem, how you'd close it.</p>
+<h3>15.1 What's already here</h3>
+<ul>
+<li>Two fail-fast protocol adapters (Modbus RTU + TCP).</li>
+<li>One strict shared data model (<code>Frame</code>).</li>
+<li>The aggregation engine that hits the -75 % KPI.</li>
+<li>A deterministic test bench, 66 tests, 99 %/100 % coverage.</li>
+</ul>
+<h3>15.2 The missing blocks (per the SDD)</h3>
+<div class="table-wrap"><table><thead><tr><th>Block</th><th>What it adds in production</th><th>Milestone</th></tr></thead><tbody><tr><td>South drivers</td><td>Real polling over Modbus/DLMS (<code>pymodbus</code>/Gurux)</td><td>M2+</td></tr><tr><td>Ingestion core</td><td>Async routing, back-pressure, ordering</td><td>M2</td></tr><tr><td>Northbound publishers</td><td>MQTT / OPC UA to Cloud &amp; SCADA (REQ-007)</td><td>M3</td></tr><tr><td>Store-and-forward</td><td>Offline SQLite buffer + replay on reconnect (REQ-002)</td><td>M4</td></tr><tr><td>Local action engine</td><td>&lt; 50 ms actuation loop (REQ-003)</td><td>M5</td></tr><tr><td>Deployment</td><td>Docker + secure OTA (REQ-005/006)</td><td>M6</td></tr><tr><td>PL (FPGA)</td><td>Hardware filtering/FFT (REQ-001a)</td><td>M8</td></tr></tbody></table></div>
+<p>Without the <em>store-and-forward</em> and <em>northbound</em> blocks, the gateway has no way to send data anywhere or survive a network outage — so in production it would be a smart local shrinker that loses data the moment the link drops.</p>
+<h3>15.3 Production concerns and how to fix them</h3>
+<ol>
+<li><strong>Observability.</strong> <em>Problem:</em> a bad frame raises <code>CorruptedPayloadError</code>, but
+nothing records it — you'd fly blind. <em>Remedy:</em> structured logging at the
+boundary (device id + <code>reason_code</code> + timestamp), per-device error counters,
+a <code>/health</code> endpoint, and alerting on error-rate thresholds.</li>
+<li><strong>A policy at the boundary.</strong> <em>Problem:</em> one malformed frame, uncaught, can kill
+the whole polling loop. <em>Remedy:</em> wrap each <code>parse()</code> in a per-device try/except;
+count, log, and drop the bad frame; add a <strong>circuit breaker</strong> so a flood of
+errors quarantines a meter instead of retrying forever.</li>
+<li><strong>Clock handling.</strong> <em>Problem:</em> <code>collected_at</code> is an unvalidated string; real
+meters drift, and wrong timestamps corrupt window ordering. <em>Remedy:</em> validate
+ISO-8601 at the schema, stamp time from <em>one trusted clock</em> at ingestion, detect
+out-of-order timestamps, and cap accepted skew.</li>
+<li><strong>Unbounded buffers.</strong> <em>Problem:</em> <code>WindowAggregator</code> holds frames per meter; a
+stalled meter grows memory without limit. <em>Remedy:</em> cap the window by count or
+duration, flush on timeout, evict idle meters, and apply back-pressure upstream.</li>
+<li><strong>Data-quality flags.</strong> <em>Problem:</em> the schema has <code>quality</code> (<code>ok</code>/<code>stale</code>/<code>suspect</code>)
+but nothing sets <code>stale</code>/<code>suspect</code> yet. <em>Remedy:</em> give each meter a heartbeat; a
+missed poll emits <code>stale</code>; CRC retries mark <code>suspect</code> — gaps become visible data.</li>
+<li><strong>Concurrency.</strong> <em>Problem:</em> the code is synchronous; 50 meters polled in series
+add latency and let one slow meter block the rest. <em>Remedy:</em> <code>asyncio</code> (one task
+per device) or a bounded thread pool, per-connection timeouts, non-blocking I/O.</li>
+<li><strong>Configuration.</strong> <em>Problem:</em> register maps, ids, and windows are hard-coded.
+<em>Remedy:</em> external config (YAML/TOML) validated against a schema, versioned,
+loaded at startup, and fail-fast if invalid; secrets kept separate.</li>
+<li><strong>Security.</strong> <em>Problem:</em> no authentication, no TLS, no key management yet.
+<em>Remedy:</em> TLS on the northbound link, device authentication, least-privilege,
+keys in hardware (Fog-Crypto Core), signed OTA. Design the seams now.</li>
+<li><strong>Failure injection &amp; soak tests.</strong> <em>Problem:</em> tests cover the happy path plus a
+5 000-frame smoke run — not failure. <em>Remedy:</em> fault injection (truncated,
+duplicated, dropped, reordered frames), multi-hour soak tests, memory profiling,
+restart recovery.</li>
+<li><strong>Determinism vs reality.</strong> <em>Problem:</em> the simulator is idealized; real meters
+jitter, drop polls, and sometimes send out-of-range values. <em>Remedy:</em> add noise,
+jitter, and dropped-poll models to the simulator; treat out-of-range as
+"flag + count", never "crash"; calibrate against real hardware.</li>
+<li><strong>Reproducibility of <code>frame_id</code>.</strong> <em>Problem:</em> <code>uuid4()</code> makes each parse
+non-identical, breaking byte-for-byte replay. <em>Remedy:</em> inject <code>frame_id</code> from
+the payload (like <code>collected_at</code>) when determinism is required.</li>
+<li><strong>Input typing at the edge.</strong> <em>Problem:</em> <code>RawPayload</code> is a plain dataclass — a
+wrongly-typed <code>unit_id</code> raises <code>TypeError</code>, outside the <code>CorruptedPayloadError</code>
+contract. <em>Remedy:</em> validate the payload fields at the boundary so <em>all</em> bad
+input fails through one clean error path.</li>
+</ol>
+<hr>
+<h2>16. The roadmap and how to move around</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M0[0 baseline] --&gt; M1[1 KPI] --&gt; M2[2 ingestion] --&gt; M3[3 northbound]
+    M3 --&gt; M4[4 store] --&gt; M5[5 action] --&gt; M6[6 deploy] --&gt; M7[7 DLMS] --&gt; M8[8 PL]
+    M8 --&gt; M9[9 Fog] --&gt; M10[10 NetSentry]</code></pre>
+<p>Work is organized into <strong>milestones</strong> — checkpoints that are done and verified. Each milestone is one clean commit in git, plus a <strong>tag</strong> (a name) so you can find it again:</p>
+<pre><code class="language-bash">git tag -a milestone-0-baseline   -m &quot;...&quot;   # the starting point
+git tag -a milestone-1-volume-kpi  -m &quot;...&quot;   # the −75 % proof
+
+git checkout milestone-0-baseline             # go look at the baseline
+git reset --hard milestone-0-baseline         # &quot;back off&quot; — undo later work</code></pre>
+<p>Here is the full roadmap (also maintained in <code>MILESTONES.md</code>). <strong>This tutorial is Part 1 of the series</strong> — it covers Milestone 0 and Milestone 1. Each later milestone gets its own part.</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Milestone</th><th>Status</th></tr></thead><tbody><tr><td>0</td><td>Baseline — adapters + Edge Analytics PS + 50-meter test bench</td><td>✅ Done (Part 1)</td></tr><tr><td>1</td><td>Volume-reduction KPI ≥ 75 %</td><td>✅ Done (Part 1)</td></tr><tr><td>2</td><td>Ingestion Core — async broker</td><td>⬜ Part 2</td></tr><tr><td>3</td><td>Northbound MQTT + Sparkplug B</td><td>⬜ Part 3</td></tr><tr><td>4</td><td>Store-and-Forward SQLite</td><td>⬜ Part 4</td></tr><tr><td>5</td><td>Local Action Engine &lt; 50 ms</td><td>⬜ Part 5</td></tr><tr><td>6</td><td>Deployment Docker/Compose/OTA</td><td>⬜ Part 6</td></tr><tr><td>7</td><td>DLMS/COSEM adapter</td><td>⬜ Part 7</td></tr><tr><td>8</td><td>Edge Analytics PL + PS/PL integration</td><td>⬜ Part 8</td></tr><tr><td>9</td><td>Fog-Crypto Core spec</td><td>⬜ Part 9</td></tr><tr><td>10</td><td>NetSentry-IoT spec</td><td>⬜ Part 10</td></tr></tbody></table></div>
+<p>The rule: <strong>never tag a milestone you haven't verified</strong>, and keep the working tree clean before tagging.</p>
+<hr>
+<h2>17. Exercises to try yourself</h2>
+<p>These are ordered from "gentle" to "stretch yourself":</p>
+<ol>
+<li><strong>Read one file end-to-end</strong> — start with <code>frame.py</code> (short). In one sentence,
+write down: what does it define, and what does it <em>refuse</em>?</li>
+<li><strong>Add a 5th register</strong> (e.g. <code>reactive_power</code>) to the shared register map.
+Run the tests. What breaks first? *(The tests will tell you — that's them
+doing their job: flagging that the contract changed.)*</li>
+<li><strong>Add a new reason code</strong> — invent one, raise it in the decoder, and write the
+failing test <em>first</em>, then make it pass.</li>
+<li><strong>Add a <code>median</code> reducer</strong> to <code>aggregate_window</code> — test first, then implement,
+then check the coverage still says 100 %.</li>
+<li><strong>Break determinism on purpose</strong> — remove a <code>seed</code> and watch which test fails.
+Then explain (in your own words) why determinism matters to the KPI.</li>
+<li><strong>Run the coverage command yourself</strong> (section 15) and find the 2 uncovered
+lines. Can you explain, in plain words, why each one doesn't need to be covered?</li>
+</ol>
+<hr>
+<h2>18. Cheat sheet (copy-paste)</h2>
+<pre><code class="language-bash"># --- run the tests ---
+cd projects/edgestream-gw/src/protocol-adapters &amp;&amp; .venv/bin/pytest -q
+#   expect: 38 passed
+
+cd projects/edgestream-gw/src/edge-analytics/ps &amp;&amp; \
+  ../../protocol-adapters/.venv/bin/python -m pytest -q
+#   expect: 19 passed
+
+cd projects/edgestream-gw/testbench &amp;&amp; \
+  ../src/protocol-adapters/.venv/bin/python -m pytest -q
+#   expect: 9 passed   (total: 66)
+
+# --- coverage ---
+cd projects/edgestream-gw/src/protocol-adapters &amp;&amp; \
+  .venv/bin/pytest --cov=protocol_adapters --cov-report=term-missing -q
+#   expect: 99 % (2 defensive lines missed)
+
+cd projects/edgestream-gw/src/edge-analytics/ps &amp;&amp; \
+  ../../protocol-adapters/.venv/bin/python -m pytest \
+  --cov=edge_analytics_ps --cov-report=term-missing -q
+#   expect: 100 %
+
+# --- the −75 % KPI measurement ---
+cd projects/edgestream-gw/performance &amp;&amp; \
+  ../src/protocol-adapters/.venv/bin/python measure_volume_reduction.py
+#   expect: byte_reduction_pct ≈ 96.07 %, pass: true
+
+# --- navigate the milestones ---
+git tag -n
+git log --oneline --decorate</code></pre>
+<hr>
+<hr>
+<h2>Appendix — Software Bill of Materials</h2>
+<p>Everything the tutorial refers to, in one list (full file: <code>SBOM.md</code>).</p>
+<p><strong>Runtime &amp; toolchain</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td>Language</td><td>Python &gt;= 3.10 (verified 3.14.4)</td></tr><tr><td>Runtime dep</td><td><code>pydantic</code> &gt;= 2.10 (verified 2.13.5)</td></tr><tr><td>Dev deps</td><td><code>pytest</code> &gt;= 7, <code>hypothesis</code> &gt;= 6, <code>pytest-cov</code>, <code>ruff</code></td></tr></tbody></table></div>
+<p><strong>Source files (Build = in-house, TDD)</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Component</th><th>Files</th></tr></thead><tbody><tr><td>Protocol adapters (<code>src/protocol-adapters</code>)</td><td><code>frame.py</code>, <code>errors.py</code>, <code>base.py</code>, <code>modbus_common.py</code>, <code>modbus_rtu.py</code>, <code>modbus_tcp.py</code>, <code>__init__.py</code>, <code>conftest.py</code></td></tr><tr><td>Edge Analytics PS (<code>src/edge-analytics/ps</code>)</td><td><code>stats.py</code>, <code>aggregate.py</code>, <code>window.py</code>, <code>__init__.py</code>, <code>conftest.py</code></td></tr><tr><td>Test bench (<code>testbench</code>)</td><td><code>meters.py</code>, <code>frame_builders.py</code>, <code>__init__.py</code>, <code>conftest.py</code></td></tr><tr><td>Performance (<code>performance</code>)</td><td><code>measure_volume_reduction.py</code></td></tr><tr><td>Report tooling (<code>reports</code>)</td><td><code>make_report.py</code></td></tr></tbody></table></div>
+<p><strong>Test files (66 tests)</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Suite</th><th>Files</th><th>Tests</th><th>Coverage</th></tr></thead><tbody><tr><td>protocol-adapters</td><td>5</td><td>38</td><td>99 %</td></tr><tr><td>edge-analytics/ps</td><td>4</td><td>19</td><td>100 %</td></tr><tr><td>testbench</td><td>2</td><td>9</td><td>n/a</td></tr></tbody></table></div>
+<p><strong>Result</strong> — KPI (Milestone 1): <strong>96.07 %</strong> northbound volume reduction (target &gt;= 75 %).</p>
+<hr>
+<p><em>That's the whole story up to Milestone 1: a strict shared Frame, fail-loud protocol adapters, a shrink-and-summarize analytics layer, a deterministic test fleet — and a measured, reproducible proof that we send 96 % less data to the Cloud. Next milestone: the ingestion core that routes those frames.</em></p>
+        <p class="faint doc-source">Source: <a href="EdgeStreamGWtutorial-milestone-1-11nov2026.md">raw markdown</a> — published as-is from the source repository.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+          <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="../../blog/index.html">Blog</a></li>
+          <li><a href="../../methode.html">Method</a></li>
+          <li><a href="../../documentation.html">Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span><span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

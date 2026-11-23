@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Software Bill of Materials — EdgeStream-GW (Milestone 1) · Helveticore Docs</title>
+  <meta name="description" content="EdgeStream-GW technical document — Software Bill of Materials — EdgeStream-GW (Milestone 1), rendered from the source markdown.">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../../index.html" aria-label="Helveticore — home">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="../../blog/index.html">Blog</a></li>
+        <li><a href="../../methode.html">Method</a></li>
+        <li><a href="../../documentation.html" aria-current="page">Docs</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="doc">
+        <a class="article-back" href="../../documentation.html">← Back to documentation</a>
+<blockquote>Snapshot of projects/edgestream-gw/SBOM.md — 11 Nov 2026</blockquote>
+<h1>Software Bill of Materials — EdgeStream-GW (Milestone 1)</h1>
+<p>_Date: 2026-10-28 · Scope: all Python source &amp; test files under <code>projects/edgestream-gw/</code> · State: Milestone 1 (KPI −75 % proven)_</p>
+<h2>1. Runtime &amp; toolchain</h2>
+<div class="table-wrap"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td>Language</td><td>Python (requires ≥ 3.10; verified on 3.14.4)</td></tr><tr><td>Runtime dependency</td><td><code>pydantic</code> (≥ 2.10; verified 2.13.5)</td></tr><tr><td>Dev dependencies</td><td><code>pytest</code> (≥ 7), <code>hypothesis</code> (≥ 6), <code>pytest-cov</code>, <code>ruff</code> (line-length 100)</td></tr><tr><td>Package</td><td><code>edgestream-protocol-adapters</code> v0.1.0</td></tr></tbody></table></div>
+<h2>2. Source files (build vs reuse)</h2>
+<p>Legend: <strong>BUILD</strong> = in-house (TDD, Fail-Fast) · <strong>REUSE</strong> = standard library / 3rd party.</p>
+<h3>2.1 <code>src/protocol-adapters/</code> — Protocol Adapters (BUILD)</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Contains</th></tr></thead><tbody><tr><td><code>protocol_adapters/frame.py</code></td><td>Strict Pydantic v2 models: <code>Frame</code>, <code>Source</code>, <code>Measurement</code> (<code>extra="forbid"</code>, bounded <code>unit_id</code>, non-empty <code>measurements</code>).</td></tr><tr><td><code>protocol_adapters/errors.py</code></td><td><code>CorruptedPayloadError(reason_code, detail, offending_field)</code> — the Fail-Fast exception.</td></tr><tr><td><code>protocol_adapters/base.py</code></td><td><code>RawPayload</code> frozen dataclass (input contract) + <code>ProtocolAdapter</code> ABC (<code>parse()</code>).</td></tr><tr><td><code>protocol_adapters/modbus_common.py</code></td><td><code>RegisterDefinition</code> + <code>decode_holding_registers()</code> (shared FC03 decode + bounds checks).</td></tr><tr><td><code>protocol_adapters/modbus_rtu.py</code></td><td><code>crc16()</code> + <code>ModbusRtuAdapter</code> (RTU ADU parsing, Fail-Fast).</td></tr><tr><td><code>protocol_adapters/modbus_tcp.py</code></td><td><code>ModbusTcpAdapter</code> (MBAP/TCP ADU parsing, Fail-Fast).</td></tr><tr><td><code>protocol_adapters/__init__.py</code></td><td>Public API re-exports (<code>Frame</code>, <code>Measurement</code>, adapters, <code>crc16</code>, <code>RegisterDefinition</code>, …).</td></tr><tr><td><code>conftest.py</code></td><td>Pytest bootstrap: makes the package importable.</td></tr></tbody></table></div>
+<h3>2.2 <code>src/edge-analytics/ps/</code> — Edge Analytics PS (BUILD)</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Contains</th></tr></thead><tbody><tr><td><code>edge_analytics_ps/stats.py</code></td><td><code>Aggregate</code> dataclass + <code>compute_stats()</code> (mean/rms/min/max/last/count).</td></tr><tr><td><code>edge_analytics_ps/aggregate.py</code></td><td><code>aggregate_window()</code> (N frames → 1) + <code>dedupe()</code> (consecutive dedup).</td></tr><tr><td><code>edge_analytics_ps/window.py</code></td><td><code>WindowAggregator</code> (time-window buffering, deterministic on <code>collected_at</code>).</td></tr><tr><td><code>edge_analytics_ps/__init__.py</code></td><td>Public API re-exports.</td></tr><tr><td><code>conftest.py</code></td><td>Pytest bootstrap: makes <code>edge_analytics_ps</code> + <code>protocol_adapters</code> importable.</td></tr></tbody></table></div>
+<h3>2.3 <code>testbench/</code> — Virtual test bench (BUILD)</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Contains</th></tr></thead><tbody><tr><td><code>meter_simulator/meters.py</code></td><td><code>STANDARD_REGISTER_MAP</code> (4 registers), <code>EnergyMeter</code>, <code>MeterFleet</code> (deterministic 50-meter simulator).</td></tr><tr><td><code>meter_simulator/frame_builders.py</code></td><td><code>build_rtu_response()</code> / <code>build_tcp_response()</code> (raw Modbus ADU builders).</td></tr><tr><td><code>meter_simulator/__init__.py</code></td><td>Public API re-exports.</td></tr><tr><td><code>conftest.py</code></td><td>Pytest bootstrap: makes <code>meter_simulator</code> + <code>protocol_adapters</code> importable.</td></tr></tbody></table></div>
+<h3>2.4 <code>performance/</code> — Measurement (BUILD)</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Contains</th></tr></thead><tbody><tr><td><code>measure_volume_reduction.py</code></td><td>Measures the −75 % KPI (simulator → adapter → <code>WindowAggregator</code> → JSON byte counts), writes <code>volume_reduction_results.json</code>.</td></tr></tbody></table></div>
+<h3>2.5 <code>reports/</code> — Documentation tooling (BUILD)</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Contains</th></tr></thead><tbody><tr><td><code>make_report.py</code></td><td>python-docx generator for the Word technical report.</td></tr></tbody></table></div>
+<h2>3. Test files</h2>
+<h3>3.1 <code>src/protocol-adapters/tests/</code> — 38 tests</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Covers</th></tr></thead><tbody><tr><td><code>test_frame_schema.py</code></td><td>Phase 0 — strict schema (required fields, types, <code>extra</code>, empty list, <code>unit_id</code> bounds).</td></tr><tr><td><code>test_modbus_rtu.py</code></td><td>Phases 1–2 — RTU happy path + all 7 <code>reason_code</code> negatives.</td></tr><tr><td><code>test_modbus_tcp.py</code></td><td>TCP happy path + MBAP/negatives.</td></tr><tr><td><code>test_properties.py</code></td><td>Phase 3 — hypothesis invariants (arbitrary bytes never crash; roundtrip).</td></tr><tr><td><code>test_contract.py</code></td><td>Phase 4 — mocked south-driver → adapter → ingestion-core boundary.</td></tr></tbody></table></div>
+<h3>3.2 <code>src/edge-analytics/ps/tests/</code> — 19 tests</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Covers</th></tr></thead><tbody><tr><td><code>test_stats.py</code></td><td><code>compute_stats</code> (empty, single, multiple, grouping).</td></tr><tr><td><code>test_aggregate.py</code></td><td><code>aggregate_window</code> (empty, bad reducer, mixed sources, N→1, rms/min/max, mean, timestamp).</td></tr><tr><td><code>test_dedupe.py</code></td><td><code>dedupe</code> (consecutive, non-consecutive, empty, identical).</td></tr><tr><td><code>test_window.py</code></td><td><code>WindowAggregator</code> (flush on crossing, no flush within, empty flush).</td></tr></tbody></table></div>
+<h3>3.3 <code>testbench/tests/</code> — 9 tests</h3>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Covers</th></tr></thead><tbody><tr><td><code>test_meter_fleet.py</code></td><td>Fleet properties (50, unique ids, determinism, bounds).</td></tr><tr><td><code>test_southbound_chain.py</code></td><td>E2E chain simulator → adapter → Frame (RTU/TCP + 5 000-frame volume).</td></tr></tbody></table></div>
+<h2>4. Verification summary (as of 2026-10-28)</h2>
+<div class="table-wrap"><table><thead><tr><th>Suite</th><th>Tests</th><th>Coverage</th></tr></thead><tbody><tr><td>protocol-adapters</td><td>38 passed</td><td>99 % (154 stmts, 2 defensive lines missed)</td></tr><tr><td>edge-analytics/ps</td><td>19 passed</td><td>100 % (90 stmts)</td></tr><tr><td>testbench</td><td>9 passed</td><td>— (integration)</td></tr><tr><td><strong>Total</strong></td><td><strong>66 passed</strong></td><td></td></tr></tbody></table></div>
+<p>KPI (Milestone 1): <strong>96.07 %</strong> northbound volume reduction (target ≥ 75 %).</p>
+        <p class="faint doc-source">Source: <a href="EdgeStreamGWSBOM-11nov2026.md">raw markdown</a> — published as-is from the source repository.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="../../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="../../projet-smart-maintenance.html">Smart Maintenance</a></li>
+          <li><a href="../../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="../../projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="../../blog/index.html">Blog</a></li>
+          <li><a href="../../methode.html">Method</a></li>
+          <li><a href="../../documentation.html">Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span><span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>
