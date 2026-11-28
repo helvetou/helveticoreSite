@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AES-256-GCM on FPGA: bit-exact against the full NIST CAVP corpus · Helveticore Blog</title>
+  <meta name="description" content="How Fog-Crypto Core validated its SystemVerilog AES-256-GCM datapath against an independent golden reference and the full 3,933-vector NIST CAVP corpus.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../index.html" aria-label="Helveticore — home">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Helveticore</span>
+      <span class="brand-sub">Consulting · IoT · IIoT</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+        <li><a href="../projet-smart-maintenance.html">Smart Maintenance</a></li>
+        <li><a href="../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+        <li><a href="../projet-fog-crypto-core.html">Fog-Crypto</a></li>
+        <li><a href="index.html" aria-current="page">Blog</a></li>
+        <li><a href="../methode.html">Method</a></li>
+        <li><a href="../documentation.html">Docs</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme (light / dark)">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <article class="article-body">
+        <a class="article-back" href="index.html">← All articles</a>
+        <header class="article-header">
+          <span class="tag tag-amber">FPGA · Security</span>
+          <h1>AES-256-GCM on FPGA: bit-exact against the full NIST CAVP corpus</h1>
+          <div class="article-meta">
+            <span>By Malek Haroud</span><span>·</span>
+            <time datetime="2026-11-28">2026-11-28</time><span>·</span>
+            <span>4 min read</span>
+          </div>
+        </header>
+        <p class="lead">The only trustworthy way to claim a crypto core is correct is to hold it
+          up against an oracle you did not write. Fog-Crypto Core now passes the full NIST CAVP
+          GCM AES-256 corpus — 3,933 vectors — bit-exact, in simulation.</p>
+
+        <h2>An independent oracle first</h2>
+        <p>We started backwards. Before writing a single line of our own SystemVerilog, we vendored
+          an independent golden reference: BLu85 AES-256-GCM (Apache-2.0, VHDL). We validated
+          <em>that</em> against the NIST CAVP GCM AES-256 corpus (3,933 vectors, IV length 96) and
+          a pycryptodome randomized sweep. Only a reference that is itself proven bit-exact can
+          judge our implementation.</p>
+
+        <h2>Then our own core, through the same seam</h2>
+        <p>The testbench exposes a simulator-agnostic seam — <code>run_vector(dut, key, iv, aad, data,
+          enc_dec) → (out, tag)</code> — so the same corpus drives both the VHDL oracle and our
+          SystemVerilog DUT under Verilator + cocotb. Our <code>aes256_gcm.sv</code> datapath runs
+          the whole corpus and diffs bit-exact against the oracle.</p>
+
+        <h2>The GHASH lesson</h2>
+        <p>The first GHASH was a combinational 128-iteration shift-and-add — a ~128-level XOR chain
+          that cannot meet 150&nbsp;MHz. It became a <strong>4-stage carryless-multiply +
+          polynomial-reduction</strong> pipeline (bit-reverse → CLMUL → reduction
+          x¹²⁸ = x⁷+x²+x+1 → bit-reverse): one multiply per cycle, latency 4. That single change is
+          what makes the line-rate target plausible.</p>
+
+        <h2>Correctness is not security</h2>
+        <p>A bit-exact GCM core can still leak plaintext if you wire decryption naively. The
+          store-and-forward wrapper (<code>aes256_gcm_saf.sv</code>) enforces
+          <strong>REQ-FOG-SEC-002</strong>: decryption buffers plaintext, verifies the received tag,
+          releases only on <code>tag_ok</code>, and on mismatch zeroizes and asserts
+          <code>ERR_CRYPTO_FAULT</code>. Encryption streams unchanged. Fault injection covers the
+          fail-safe path.</p>
+
+        <h2>What this does — and does not — prove</h2>
+        <p>It proves the datapath is <strong>functionally correct</strong> for the full official
+          corpus. It does <strong>not</strong> yet prove timing, area, or the on-board KPIs — those
+          need the Vivado out-of-context synthesis gate and a ZU3EG bench. That is exactly the next
+          step, and the script and XDC are already prepared.</p>
+
+        <p>The discipline generalises: <strong>vendor an oracle, prove the oracle, then diff your
+          own implementation against it through one seam.</strong> Crypto on an FPGA is unforgiving —
+          every vector must match, not most of them.</p>
+
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Helveticore OÜ</h3>
+        <p class="muted">Technology consulting for industrial IoT &amp; IIoT — edge gateways, smart maintenance and edge security. Registered in Tallinn
+          (Estonia).</p>
+        <p class="faint">Registry: 17526982 · Founded in 2026</p>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <ul>
+          <li>Harju county, Tallinn,<br>Kesklinn district,<br>Tartu mnt 67/1-13b, 10115</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../projet-edgestream-gw.html">EdgeStream-GW</a></li>
+          <li><a href="../projet-smart-maintenance.html">Smart Maintenance</a></li>
+          <li><a href="../projet-netsentry-iot.html">NetSentry-IoT</a></li>
+          <li><a href="../projet-fog-crypto-core.html">Fog-Crypto Core</a></li>
+          <li><a href="index.html">Blog</a></li>
+          <li><a href="../methode.html">Method</a></li>
+          <li><a href="../documentation.html">Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span><span id="year">2026</span> Helveticore OÜ — Tallinn, Estonia.</span>
+      <span>Static HTML/CSS/JS site · Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

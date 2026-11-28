@@ -94,8 +94,9 @@
               for IT/OT convergence, with measured data reduction.</li>
             <li><strong>Industrial protocols</strong> — Modbus RTU/TCP, MQTT (Sparkplug B), OPC UA,
               DLMS/COSEM — into containerised environments (Docker).</li>
-            <li><strong>Hardware acceleration</strong> — specification of hybrid FPGA systems
-              (Fog-Crypto Core) and PS/PL partitioning on Zynq UltraScale+.</li>
+            <li><strong>Hardware acceleration</strong> — hybrid FPGA systems (Fog-Crypto Core:
+              AES-256-GCM datapath validated bit-exact vs NIST CAVP) and PS/PL partitioning on
+              Zynq UltraScale+.</li>
           </ul>
         </div>
         <div class="card">
@@ -159,7 +160,8 @@
           <span class="tag tag-amber">FPGA · Security</span>
           <h3>🔐 Fog-Crypto Core</h3>
           <p class="muted">HW/SW co-design FPGA accelerator to offload critical computations and
-            secure IoT nodes — line-rate encryption, CPU load ÷ 10.</p>
+            secure IoT nodes — AES-256-GCM validated bit-exact vs NIST CAVP; targets: line-rate
+            encryption, CPU load ÷ 10.</p>
           <span class="arrow">Discover →</span>
         </a>
       </div>

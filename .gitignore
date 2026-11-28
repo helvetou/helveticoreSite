@@ -20,6 +20,9 @@ linkedin-profile.md
 # Outil personnel de push (hors site)
 push-remote.sh
 
+# Lien local vers le dépôt source (chemin absolu, hors site)
+EdgeStream-GW_projectLink
+
 # wrangler files
 .wrangler
 .dev.vars*

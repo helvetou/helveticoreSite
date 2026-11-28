@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fog-Crypto Core — FPGA hardware accelerator · Helveticore</title>
-  <meta name="description" content="Fog-Crypto Core: an FPGA HW/SW co-design module for offloading critical computations and securing IoT nodes. KPI: CPU load ÷ 10, line-rate encryption.">
+  <meta name="description" content="Fog-Crypto Core: an FPGA HW/SW co-design module for offloading critical computations and securing IoT nodes. AES-256-GCM datapath implemented and validated bit-exact vs NIST CAVP (3,933 vectors). Targets: CPU load ÷ 10, line-rate encryption.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -45,22 +45,23 @@
       <div class="section-head">
         <span class="eyebrow">Project 2 of the triptych</span>
         <h1>Fog-Crypto Core</h1>
-        <p class="lede">A <strong>HW/SW co-design</strong> module dedicated to offloading critical
-          computations and securing IoT nodes. Positioning: data integrity <strong>at the
-          source</strong> for sensitive industrial infrastructures.</p>
+        <p class="lede">An <strong>HW/SW co-design</strong> FPGA accelerator dedicated to offloading
+          critical computations and securing IoT nodes — data integrity and confidentiality
+          <strong>at the source</strong> for sensitive industrial infrastructures. The AES-256-GCM
+          crypto datapath is now implemented and validated bit-exact in simulation.</p>
         <div style="margin-top:16px">
-          <span class="status status-init"><span class="status-dot" aria-hidden="true"></span>Phase: framing — structure initialized</span>
+          <span class="status status-build"><span class="status-dot" aria-hidden="true"></span>Phase: implementation — M0–M5 done (AES-256-GCM validated vs NIST CAVP)</span>
         </div>
       </div>
 
       <div class="kpi-banner" style="margin-bottom:40px">
         <div class="kpi">
-          <div class="kpi-value"><em>÷&nbsp;10</em></div>
-          <div class="kpi-label">main gateway CPU load (hardware offload)</div>
+          <div class="kpi-value"><em>3,933</em></div>
+          <div class="kpi-label">NIST CAVP GCM AES-256 vectors passed bit-exact (simulation, Verilator + cocotb)</div>
         </div>
         <div class="kpi">
-          <div class="kpi-value"><em>Line-rate</em></div>
-          <div class="kpi-label">stream encryption / processing at line rate</div>
+          <div class="kpi-value"><em>÷&nbsp;10</em></div>
+          <div class="kpi-label">host CPU offload — Phase 2 target (÷ 2 MVP); on-board benchmark pending</div>
         </div>
       </div>
 
@@ -69,47 +70,81 @@
           <h3>Project card</h3>
           <ul class="clean-list">
             <li><strong>Developed by</strong> — Helveticore OÜ (Estonia)</li>
+            <li><strong>Hardware target</strong> — AMD Xilinx Zynq UltraScale+ MPSoC — baseline ZU3EG</li>
             <li><strong>Maturity</strong> — CMMI Level 3 “Defined”</li>
-            <li><strong>Discipline</strong> — HW/SW co-design, SystemVerilog / Verilog</li>
-            <li><strong>Host buses</strong> — SPI / PCIe (high-speed)</li>
+            <li><strong>Discipline</strong> — HW/SW co-design, SystemVerilog (Verilator + cocotb)</li>
+            <li><strong>Source document</strong> — SDD IEEE 1016 + ICD (frozen HW/SW boundary)</li>
           </ul>
         </div>
         <div class="card">
-          <h3>Sub-projects (src/)</h3>
+          <h3>Positioning &amp; targets</h3>
+          <p class="muted">Two disjoint data paths: authenticated encryption (AES-256-GCM at line
+            rate) and real-time sensor pre-processing (CIC / moving average) — offloading the
+            Cortex-A53.</p>
           <ul class="clean-list">
-            <li><code>rtl/</code> — logic blocks optimized for FPGA.</li>
-            <li><code>bus-interfaces/</code> — low-level SPI / PCIe communication to the embedded Linux host.</li>
-            <li><code>crypto-engines/</code> — hardware encryption and real-time signal pre-processing.</li>
-            <li><code>host-integration/</code> — drivers and interface on the host processor side.</li>
+            <li><strong>CPU offload</strong> — ÷ 2 (MVP) / ÷ 10 (Phase 2), bench pending.</li>
+            <li><strong>Line rate</strong> — 100 MbE (MVP) / 1 GbE (Phase 2), zero frame loss.</li>
+            <li><strong>Latency</strong> — AES ≤ 100 cycles; crypto end-to-end ≤ 20 µs (targets).</li>
           </ul>
         </div>
       </div>
 
-      <h2>Milestones &amp; risks</h2>
+      <h2>Implemented crypto datapath</h2>
+      <p class="muted"><code>src/crypto-engines/</code> — SystemVerilog, validated bit-exact against
+        a vendored golden reference (BLu85 AES-256-GCM).</p>
+      <div class="grid grid-2" style="margin-top:16px">
+        <div class="card">
+          <ul class="clean-list">
+            <li><code>aes256_core.sv</code> — iterative AES-256 encrypt (15 cycles/block). <span class="tag tag-teal">bit-exact</span></li>
+            <li><code>ghash_core.sv</code> — pipelined GHASH GF(2¹²⁸) multiplier (CLMUL + reduction, 4 stages). <span class="tag tag-teal">bit-exact</span></li>
+            <li><code>ghash_accumulator.sv</code> — GHASH feedback accumulator. <span class="tag tag-teal">bit-exact</span></li>
+            <li><code>aes256_gcm.sv</code> — AES-256-GCM datapath (encrypt + decrypt + tag). <span class="tag tag-teal">bit-exact</span></li>
+            <li><code>aes256_gcm_saf.sv</code> — store-and-forward + fail-safe (REQ-FOG-SEC-002). <span class="tag tag-teal">validated</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <ul class="clean-list">
+            <li><code>aes256_gcm_axis.sv</code> — AXI4-Stream wrapper. <span class="tag tag-teal">validated</span></li>
+            <li><code>sg_dma.sv</code> — SG-DMA / descriptor-engine skeleton. <span class="tag tag-teal">validated</span></li>
+            <li><code>pl_mac.sv</code> — PL MAC skeleton (802.3x PAUSE + tx_er fail-safe). <span class="tag tag-teal">validated</span></li>
+            <li><code>fog_crypto_top.sv</code> — integration top (crypto + SG-DMA + PL MAC). <span class="tag tag-teal">validated</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 style="margin-top:40px">Milestones &amp; risks</h2>
       <div class="grid grid-2" style="margin-top:16px">
         <div class="card">
           <h3>Milestones</h3>
           <ul class="clean-list">
-            <li>1 · Virtual test bench: RTL co-simulation + software reference model.</li>
-            <li>2 · Basic logic blocks + simulated SPI/PCIe interface.</li>
-            <li>3 · Line-rate encryption engine validated in simulation.</li>
-            <li>4 · Integration on an embedded Linux host board (real benchmark).</li>
+            <li>M0 · Golden reference (BLu85 AES-256-GCM) vendored &amp; validated — <strong>done</strong>.</li>
+            <li>M1 · Cross-check harness + SystemVerilog path proven (Verilator + cocotb) — <strong>done</strong>.</li>
+            <li>M2 · AES-256 core + GCM datapath in SystemVerilog — <strong>done</strong>.</li>
+            <li>M3 · Bit-exact diff vs golden model (3,933 CAVP vectors) — <strong>done</strong>.</li>
+            <li>M4 · Store-and-forward + fail-safe (REQ-FOG-SEC-002) — <strong>done</strong>.</li>
+            <li>M5 · Integration top + pipelined GHASH + SG-DMA + PL MAC + OOC synthesis script — <strong>done</strong>.</li>
+            <li>Next · OOC synthesis on ZU3EG (Vivado), then on-board benchmark (project milestone 4).</li>
           </ul>
         </div>
         <div class="card">
           <h3>Key risks (RSK)</h3>
           <ul class="clean-list">
-            <li><strong>Meeting FPGA timing</strong> at target frequency — mitigated by RTL testbench and constraints.</li>
-            <li><strong>HW/SW coherence of the SPI/PCIe interface</strong> — mitigated by a common interface contract.</li>
-            <li><strong>Key security and side channels</strong> — to be addressed from design stage.</li>
+            <li><strong>Meeting FPGA timing (≥ 150 MHz)</strong> — mitigated by the pipelined GHASH and the OOC synthesis script + XDC; Vivado run pending.</li>
+            <li><strong>HW/SW coherence of the AXI4 SG-DMA</strong> — mitigated by the frozen ICD and VFIO (D-6).</li>
+            <li><strong>Key security and side channels</strong> — MVP uses BBRAM key; Phase 2 adds DOM masking, CSU PUF + AES-256-KW (D-4).</li>
           </ul>
         </div>
       </div>
 
       <div class="note" style="margin-top:32px">
-        <strong>Current state:</strong> the project's CMMI structure is initialized (requirements,
-        design, test bench, performance) and the project charter is set. Detailed artifacts remain
-        to be written.
+        <strong>Current state:</strong> the CMMI Level 3 specification set (Rev 2.0) is frozen —
+        25 tiered requirements, RTM, SDD, ICD, 17 decisions — and the AES-256-GCM crypto datapath
+        is implemented and validated bit-exact against the full NIST CAVP GCM AES-256 corpus
+        (3,933 vectors) plus a pycryptodome sweep, cross-checked against the vendored golden
+        reference. Store-and-forward / fail-safe fault injection passes. The OOC synthesis script
+        and XDC for ZU3EG are prepared (Vivado required to run). The headline KPIs (CPU ÷ 2/÷ 10,
+        line rate) are defined and traceable but not yet bench-measured — that is the next,
+        on-board milestone.
       </div>
     </div>
   </section>
